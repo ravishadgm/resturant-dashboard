@@ -1,0 +1,3 @@
+import EntityPage from '../../components/common/EntityPage';
+const fields=[{name:'name',label:'Restaurant name',placeholder:'e.g. The Saffron Table'},{name:'email',label:'Email address',type:'email',placeholder:'hello@restaurant.com'},{name:'phone',label:'Phone number',placeholder:'+91 98765 43210'},{name:'location',label:'Location',placeholder:'City, State'},{name:'address',label:'Full address',placeholder:'Street and locality',as:'textarea'},{name:'image',label:'Restaurant image',required:false}];
+export default function RestaurantList(){return <EntityPage type="restaurants" singular="Restaurant" title="Restaurants" description="Manage restaurant locations and contact information." fields={fields}/>}

@@ -1,0 +1,3 @@
+import EntityPage from '../../components/common/EntityPage';
+const fields=[{name:'name',label:'Setting name',placeholder:'e.g. West Region'},{name:'email',label:'Email address',type:'email',placeholder:'region@restrodesk.com'},{name:'phone',label:'Phone number',placeholder:'+91 98765 43210'},{name:'location',label:'Location',placeholder:'City, State'},{name:'address',label:'Full address',placeholder:'Street and locality',as:'textarea'},{name:'image',label:'Image',required:false}];
+export default function SettingList(){return <EntityPage type="settings" singular="Setting" title="Settings" description="Configure and maintain your operational locations." fields={fields}/>}

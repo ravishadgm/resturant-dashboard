@@ -1,0 +1,14 @@
+import { useEffect, useRef, useState } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { ChevronDown, LayoutDashboard, LogOut, Menu, Settings, ShieldCheck, Store, UserRound, Users, X } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { ROLE_LABELS, ROLES } from '../../utils/constants';
+import Avatar from '../common/Avatar';
+export default function DashboardLayout() {
+  const { user, logout } = useAuth(); const nav = useNavigate(); const location=useLocation(); const [mobile,setMobile]=useState(false); const [menu,setMenu]=useState(false); const menuRef=useRef();
+  useEffect(()=>setMobile(false),[location.pathname]);
+  useEffect(()=>{const close=e=>!menuRef.current?.contains(e.target)&&setMenu(false);document.addEventListener('mousedown',close);return()=>document.removeEventListener('mousedown',close)},[]);
+  const links = user.role===ROLES.SUPER_ADMIN ? [[LayoutDashboard,'Overview','/dashboard'],[Store,'Restaurants','/restaurants'],[UserRound,'My profile','/profile']] : [[LayoutDashboard,'Overview','/dashboard'],[Users,'Managers','/manager'],[Settings,'Settings','/settings']];
+  const signOut=()=>{logout();nav('/login')};
+  return <div className="app-shell"><aside className={`sidebar ${mobile?'open':''}`}><div className="brand"><span><ShieldCheck/></span><div><strong>RestroDesk</strong><small>Restaurant Dashboard</small></div><button className="mobile-close" onClick={()=>setMobile(false)}><X/></button></div><nav><p>WORKSPACE</p>{links.map(([Icon,label,to])=><NavLink key={to} to={to} className={({isActive})=>isActive?'active':''}><Icon size={19}/><span>{label}</span></NavLink>)}</nav><div className="sidebar-user"><Avatar name={user.name} image={user.image}/><div><strong>{user.name}</strong><small>{ROLE_LABELS[user.role]}</small></div></div></aside>{mobile&&<div className="sidebar-overlay" onClick={()=>setMobile(false)}/>}<div className="app-main"><header className="topbar"><button className="menu-trigger" onClick={()=>setMobile(true)}><Menu/></button><div className="topbar-title"><span>{location.pathname.split('/')[1]||'dashboard'}</span><strong>{location.pathname==='/dashboard'?'Dashboard overview':'Restaurant workspace'}</strong></div><div className="topbar-actions"><div className="profile-menu" ref={menuRef}><button onClick={()=>setMenu(!menu)}><Avatar name={user.name} image={user.image} size={36}/><span><strong>{user.name}</strong><small>{ROLE_LABELS[user.role]}</small></span><ChevronDown size={16}/></button>{menu&&<div className="profile-dropdown">{user.role===ROLES.SUPER_ADMIN&&<button onClick={()=>{nav('/profile');setMenu(false)}}><UserRound size={17}/> Profile settings</button>}<button onClick={signOut} className="danger"><LogOut size={17}/> Sign out</button></div>}</div></div></header><main className="page-content"><Outlet/></main></div></div>;
+}
