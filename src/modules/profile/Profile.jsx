@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Camera, Save, ShieldCheck, UserRound } from 'lucide-react';
+import { Save, ShieldCheck, UserRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
-import Avatar from '../../components/common/Avatar';
 import FormField from '../../components/common/FormField';
 import ImageUpload from '../../components/common/ImageUpload';
 import PageHeader from '../../components/common/PageHeader';
