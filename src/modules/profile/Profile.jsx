@@ -48,6 +48,14 @@ export default function Profile() {
           <FormField label="Phone number" name="phone" value={values.phone} onChange={change} error={errors.phone} />
           <FormField label="Password" name="password" type="password" value={values.password} onChange={change} error={errors.password} autoComplete="new-password" />
           <label className="field"><span>Role</span><div className="readonly-field"><ShieldCheck />{ROLE_LABELS[user.role]}</div></label>
+          <label className="field"><span>User ID</span><div className="readonly-field">{user.user_id || 'Assigned by API'}</div></label>
+          {user.restaurant_id&&<label className="field"><span>Restaurant ID</span><div className="readonly-field">{user.restaurant_id}</div></label>}
+          {user.branch_id&&<label className="field"><span>Assigned branch</span><div className="readonly-field">{user.branch_id}</div></label>}
+          {user.manager_id&&<label className="field"><span>Manager ID</span><div className="readonly-field">{user.manager_id}</div></label>}
+          {user.customer_id&&<label className="field"><span>Customer ID</span><div className="readonly-field">{user.customer_id}</div></label>}
+          <label className="field"><span>Account status</span><div className="readonly-field">{user.status || 'ACTIVE'}</div></label>
+          <label className="field"><span>Created at</span><div className="readonly-field">{user.created_at || 'Managed by API'}</div></label>
+          <label className="field"><span>Updated at</span><div className="readonly-field">{user.updated_at || 'Managed by API'}</div></label>
         </div>
         <footer><button className="btn primary"><Save /> Save changes</button></footer>
       </form>

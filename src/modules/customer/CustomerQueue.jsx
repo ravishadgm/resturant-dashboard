@@ -1,0 +1,18 @@
+import { useEffect, useState } from 'react';
+import { Clock3, MapPin, Plus, UsersRound, X } from 'lucide-react';
+import PageHeader from '../../components/common/PageHeader';
+import { Modal } from '../../components/common/Modal';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import { queueService } from '../../services/queueService';
+
+export default function CustomerQueue(){
+  const {user}=useAuth(); const toast=useToast(); const [rows,setRows]=useState([]); const [open,setOpen]=useState(false); const [memberCount,setMemberCount]=useState(2); const [branchId,setBranchId]=useState('BR-001');
+  const load=()=>queueService.list().then(data=>setRows(data.filter(row=>row.customer_id===user.customer_id||row.phone===user.phone)));
+  useEffect(()=>{load()},[]); const current=rows.find(row=>['waiting','notified','seated'].includes(row.status));
+  const join=async event=>{event.preventDefault();const all=await queueService.list();const today=all.filter(row=>row.branch_id===branchId);await queueService.add({guestName:user.name,phone:user.phone,customer_id:user.customer_id||'CUSTOMER-ME',branch_id:branchId,queue_number:today.length+1,partySize:Number(memberCount),member_count:Number(memberCount),preference:'Any',quotedWait:20,notes:''});setOpen(false);load();toast('You joined today’s waiting queue.')};
+  const cancel=async()=>{await queueService.update(current.id,{status:'cancelled',cancelled_at:new Date().toISOString(),completedAt:new Date().toISOString()});load();toast('Queue entry cancelled and preserved in history.')};
+  const peopleAhead=current?Math.max(0,(current.queue_number||1)-1):0;
+  return <><PageHeader eyebrow="TODAY ONLY" title="My queue" description="Join the current business-day waiting list and track your turn." action={!current&&<button className="btn primary" onClick={()=>setOpen(true)}><Plus size={17}/> Join queue</button>}/>{current?<section className="customer-ticket"><div className="ticket-number"><small>Your queue number</small><strong>#{String(current.queue_number||1).padStart(2,'0')}</strong><span className={`registry-status ${current.status}`}>{current.status}</span></div><div className="ticket-metrics"><div><UsersRound/><span>People ahead<strong>{peopleAhead}</strong></span></div><div><UsersRound/><span>Members<strong>{current.member_count||current.partySize}</strong></span></div><div><Clock3/><span>Estimated wait<strong>{current.quotedWait} min</strong></span></div><div><MapPin/><span>Branch<strong>{current.branch_id||'BR-001'}</strong></span></div></div>{current.status==='waiting'&&<button className="btn destructive" onClick={cancel}><X size={17}/> Cancel queue</button>}</section>:<div className="queue-empty panel"><UsersRound/><h3>You are not in a queue</h3><p>There are no future bookings. Join a branch’s queue for today.</p><button className="btn primary" onClick={()=>setOpen(true)}>Join today’s queue</button></div>}
+    <Modal open={open} title="Join waiting queue" onClose={()=>setOpen(false)}><form className="entity-form" onSubmit={join}><div className="form-grid"><label className="field"><span>Branch</span><select value={branchId} onChange={e=>setBranchId(e.target.value)}><option value="BR-001">Adajan Branch</option><option value="BR-002">Vesu Branch</option></select></label><label className="field"><span>Member count</span><input type="number" min="1" max="20" value={memberCount} onChange={e=>setMemberCount(e.target.value)}/></label></div><footer className="modal-actions form-actions"><button type="button" className="btn secondary" onClick={()=>setOpen(false)}>Cancel</button><button className="btn primary">Join queue</button></footer></form></Modal></>;
+}

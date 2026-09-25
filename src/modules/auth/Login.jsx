@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Building2, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -53,11 +53,14 @@ export default function Login() {
           </label>
           <button className="login-submit" disabled={busy}>{busy ? 'Signing in...' : <>Sign in <ArrowRight size={18} /></>}</button>
         </form>
+        <Link className="customer-register-link" to="/register">New customer? Create an account</Link>
         <div className="simple-demo">
           <span>Demo login</span>
-          <div>
+          <div className="demo-account-grid">
             <button type="button" onClick={() => useDemo('superadmin@restrodesk.com', 'Super@123')}><ShieldCheck /> Super Admin</button>
             <button type="button" onClick={() => useDemo('restaurant@restrodesk.com', 'Restaurant@123')}><Building2 /> Restaurant</button>
+            <button type="button" onClick={() => useDemo('manager@restrodesk.com', 'Manager@123')}><Building2 /> Manager</button>
+            <button type="button" onClick={() => useDemo('customer@restrodesk.com', 'Customer@123')}><Building2 /> Customer</button>
           </div>
         </div>
       </section>
