@@ -2,7 +2,6 @@ import { useState } from "react";
 import { ArrowLeft, UserPlus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { authService } from "./authService";
-import { entityService } from "../../services/entityService";
 
 export default function CustomerRegister() {
   const navigate = useNavigate();
@@ -13,24 +12,25 @@ export default function CustomerRegister() {
     password: "",
   });
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
   const change = (e) =>
     setValues({ ...values, [e.target.name]: e.target.value });
   const submit = async (e) => {
     e.preventDefault();
     setError("");
+    setBusy(true);
     try {
-      const account = authService.registerCustomer(values);
-      await entityService.create("customers", {
-        customer_id: account.customer_id,
-        user_id: account.user_id,
-        name: account.name,
-        email: account.email,
-        phone: account.phone,
-        status: "ACTIVE",
+      await authService.registerCustomer({
+        name: values.name.trim(),
+        email: values.email.trim(),
+        phone: values.phone.trim(),
+        password: values.password,
       });
       navigate("/login");
     } catch (err) {
       setError(err.message);
+    } finally {
+      setBusy(false);
     }
   };
   return (
@@ -92,8 +92,8 @@ export default function CustomerRegister() {
               />
             </div>
           </label>
-          <button className="login-submit">
-            <UserPlus /> Create account
+          <button className="login-submit" disabled={busy}>
+            <UserPlus /> {busy ? "Creating account..." : "Create account"}
           </button>
         </form>
       </section>

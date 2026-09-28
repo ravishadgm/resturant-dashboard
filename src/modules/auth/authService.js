@@ -1,75 +1,56 @@
 import { storage } from "../../services/storageService";
 import { STORAGE_KEYS, ROLES } from "../../utils/constants";
-const accounts = [
-  {
-    email: "superadmin@restrodesk.com",
-    password: "Super@123",
-    role: ROLES.SUPER_ADMIN,
-    user_id: "USR-001",
-    status: "ACTIVE",
-    name: "Super Admin",
-    phone: "+91 98765 43210",
-    image: "",
-  },
-  {
-    email: "restaurant@restrodesk.com",
-    password: "Restaurant@123",
-    role: ROLES.RESTAURANT,
-    user_id: "USR-101",
-    restaurant_id: "REST-001",
-    status: "ACTIVE",
-    name: "Restaurant Admin",
-    phone: "+91 98765 12345",
-    image: "",
-  },
-  {
-    email: "manager@restrodesk.com",
-    password: "Manager@123",
-    role: ROLES.MANAGER,
-    name: "Branch Manager",
-    phone: "+91 98765 22222",
-    branch_id: "BR-001",
-    manager_id: "MGR-001",
-    status: "ACTIVE",
-    image: "",
-  },
-  {
-    email: "customer@restrodesk.com",
-    password: "Customer@123",
-    role: ROLES.CUSTOMER,
-    name: "Demo Customer",
-    phone: "+91 98765 33333",
-    customer_id: "CUS-001",
-    status: "ACTIVE",
-    image: "",
-  },
-];
+import { authApi } from "../../api/authApi";
 export const authService = {
-  login(email, password) {
-    const profiles = storage.get(STORAGE_KEYS.profiles, {});
-    const account = [...accounts,...storage.get(STORAGE_KEYS.accounts,[])]
-      .map((a) => ({ ...a, ...(profiles[a.role] || {}) }))
-      .find(
-        (a) =>
-          a.email.toLowerCase() === email.toLowerCase() &&
-          a.password === password,
-      );
-    if (!account)
-      throw new Error("The email or password you entered is incorrect.");
+  async login(email, password, role = ROLES.SUPER_ADMIN) {
+    const loginRequests = {
+      [ROLES.SUPER_ADMIN]: authApi.adminLogin,
+      [ROLES.RESTAURANT]: authApi.restaurantLogin,
+      [ROLES.MANAGER]: authApi.managerLogin,
+      [ROLES.CUSTOMER]: authApi.customerLogin,
+    };
+    const loginRequest = loginRequests[role] || authApi.adminLogin;
+    const response = await loginRequest({ email, password });
+    const data = response?.data ?? response;
+    const token = data?.token;
+    const apiUser = data?.user;
+
+    if (!token || !apiUser) {
+      throw new Error("The server returned an invalid login response.");
+    }
+
+    const account = {
+      ...apiUser,
+      role,
+      name: apiUser.name || apiUser.full_name || apiUser.email || "User",
+      image: apiUser.image || apiUser.profile_image || "",
+    };
+
+    storage.set(STORAGE_KEYS.authToken, token);
     storage.set(STORAGE_KEYS.session, account);
     return account;
   },
   current() {
     return storage.get(STORAGE_KEYS.session);
   },
-  logout() {
-    storage.remove(STORAGE_KEYS.session);
+  async logout() {
+    const user = storage.get(STORAGE_KEYS.session);
+    const logoutRequests = {
+      [ROLES.SUPER_ADMIN]: authApi.adminLogout,
+      [ROLES.RESTAURANT]: authApi.restaurantLogout,
+      [ROLES.MANAGER]: authApi.managerLogout,
+      [ROLES.CUSTOMER]: authApi.customerLogout,
+    };
+    const logoutRequest = logoutRequests[user?.role] || authApi.adminLogout;
+    try {
+      return await logoutRequest();
+    } finally {
+      storage.remove(STORAGE_KEYS.session);
+      storage.remove(STORAGE_KEYS.authToken);
+    }
   },
-  registerCustomer(data) {
-    const custom=storage.get(STORAGE_KEYS.accounts,[]);
-    if([...accounts,...custom].some(account=>account.email.toLowerCase()===data.email.toLowerCase())) throw new Error('An account with this email already exists.');
-    const account={...data,user_id:`USR-${Date.now().toString().slice(-6)}`,customer_id:`CUS-${Date.now().toString().slice(-6)}`,role:ROLES.CUSTOMER,status:'ACTIVE',created_at:new Date().toISOString(),image:''};
-    storage.set(STORAGE_KEYS.accounts,[...custom,account]); return account;
+  async registerCustomer(data) {
+    return authApi.customerRegister(data);
   },
   saveProfile(role, profile) {
     const profiles = storage.get(STORAGE_KEYS.profiles, {});

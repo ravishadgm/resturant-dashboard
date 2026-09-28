@@ -80,9 +80,14 @@ export default function DashboardLayout() {
     ],
   };
   const links = roleLinks[user.role] || roleLinks[ROLES.CUSTOMER];
-  const signOut = () => {
-    logout();
-    nav("/login");
+  const signOut = async () => {
+    try {
+      await logout();
+    } catch {
+      // The local session is cleared even if the server cannot be reached.
+    } finally {
+      nav("/login");
+    }
   };
   return (
     <div className="app-shell">
