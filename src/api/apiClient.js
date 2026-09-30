@@ -1,7 +1,7 @@
 import { storage } from '../services/storageService';
 import { STORAGE_KEYS } from '../utils/constants';
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://godine.cloud').replace(/\/$/, '');
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://godine.cloud').replace(/\/$/, '');
 
 const getErrorMessage = (payload, status) => {
   if (typeof payload === 'string' && payload.trim()) return payload;
@@ -11,17 +11,18 @@ const getErrorMessage = (payload, status) => {
 async function request(path, options = {}) {
   const { body, headers, ...requestOptions } = options;
   const token = storage.get(STORAGE_KEYS.authToken);
+  const isFormData = body instanceof FormData;
 
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
       ...requestOptions,
       headers: {
         Accept: 'application/json',
-        ...(body !== undefined && { 'Content-Type': 'application/json' }),
+        ...(body !== undefined && !isFormData && { 'Content-Type': 'application/json' }),
         ...(token && { Authorization: `Bearer ${token}` }),
         ...headers,
       },
-      ...(body !== undefined && { body: typeof body === 'string' ? body : JSON.stringify(body) }),
+      ...(body !== undefined && { body: typeof body === 'string' || isFormData ? body : JSON.stringify(body) }),
     });
 
     const contentType = response.headers.get('content-type') || '';

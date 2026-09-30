@@ -10,9 +10,7 @@ import {
   LogOut,
   MapPin,
   Menu,
-  Settings,
   ShieldCheck,
-  Smartphone,
   Store,
   UserRound,
   Users,
@@ -53,15 +51,12 @@ export default function DashboardLayout() {
       [Armchair, "Tables", "/tables"],
       [ListOrdered, "Live queue", "/queue"],
       [History, "Complete history", "/history"],
-      [Smartphone, "Device tokens", "/devices"],
-      [Settings, "My profile", "/profile"],
     ],
     [ROLES.RESTAURANT]: [
       [LayoutDashboard, "Overview", "/dashboard"],
       [Building2, "Branches", "/branches"],
       [Users, "Managers", "/managers"],
       [Armchair, "Tables", "/tables"],
-      [UserRound, "Restaurant profile", "/profile"],
     ],
     [ROLES.MANAGER]: [
       [LayoutDashboard, "Overview", "/dashboard"],
@@ -69,14 +64,11 @@ export default function DashboardLayout() {
       [UserRound, "Customers", "/customers"],
       [Armchair, "Tables", "/tables"],
       [History, "Today's history", "/history"],
-      [Settings, "My profile", "/profile"],
     ],
     [ROLES.CUSTOMER]: [
       [LayoutDashboard, "Overview", "/dashboard"],
       [MapPin, "Nearby restaurants", "/nearby"],
       [ListOrdered, "My queue", "/my-queue"],
-      [Smartphone, "My devices", "/devices"],
-      [UserRound, "My profile", "/profile"],
     ],
   };
   const links = roleLinks[user.role] || roleLinks[ROLES.CUSTOMER];
@@ -179,16 +171,6 @@ export default function DashboardLayout() {
               </button>
               {menu && (
                 <div className="profile-dropdown">
-                  {user.role === ROLES.SUPER_ADMIN && (
-                    <button
-                      onClick={() => {
-                        nav("/profile");
-                        setMenu(false);
-                      }}
-                    >
-                      <UserRound size={17} /> Profile settings
-                    </button>
-                  )}
                   <button onClick={signOut} className="danger">
                     <LogOut size={17} /> Sign out
                   </button>

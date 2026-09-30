@@ -1,18 +1,83 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Eye, Pencil, Plus } from 'lucide-react';
 import CommonTable from '../../components/common/CommonTable';
+import ServerTable from '../../components/common/ServerTable';
 import EntityForm from '../../components/common/EntityForm';
 import PageHeader from '../../components/common/PageHeader';
 import { Modal } from '../../components/common/Modal';
 import { useToast } from '../../context/ToastContext';
 import { entityService } from '../../services/entityService';
+import { restaurantApi } from '../../api/restaurantApi';
+import { branchApi } from '../../api/branchApi';
+import { managerApi } from '../../api/managerApi';
+import { customerApi } from '../../api/customerApi';
+import { tableApi } from '../../api/tableApi';
+import { API_BASE_URL } from '../../api/apiClient';
 import { useAuth } from '../../context/AuthContext';
 import { ROLES } from '../../utils/constants';
 
 const activeOptions=['ACTIVE','INACTIVE'];
+const branchUpdateFields=[
+  {name:'name',label:'Branch name'},
+  {name:'city',label:'City'},
+  {name:'email',label:'Email address',type:'email'},
+  {name:'phone',label:'Phone number'},
+  {name:'latitude',label:'Latitude',type:'number',step:'any'},
+  {name:'longitude',label:'Longitude',type:'number',step:'any'}
+];
+const branchListFields=[
+  {name:'branch_id',label:'Branch ID'},
+  {name:'restaurant_id',label:'Restaurant ID'},
+  {name:'restaurant_name',label:'Restaurant'},
+  {name:'name',label:'Branch name'},
+  {name:'address',label:'Address'},
+  {name:'city',label:'City'},
+  {name:'latitude',label:'Latitude'},
+  {name:'longitude',label:'Longitude'},
+  {name:'phone',label:'Phone'},
+  {name:'email',label:'Email'},
+  {name:'status',label:'Status'},
+  {name:'queue_enabled',label:'Queue'},
+  {name:'created_at',label:'Created at'},
+  {name:'updated_at',label:'Updated at'}
+];
+const managerListFields=[
+  {name:'manager_id',label:'Manager ID'},
+  {name:'restaurant_name',label:'Restaurant'},
+  {name:'branch_name',label:'Branch'},
+  {name:'name',label:'Manager name'},
+  {name:'email',label:'Email'},
+  {name:'phone',label:'Phone'},
+  {name:'status',label:'Status'},
+  {name:'created_at',label:'Created at'},
+  {name:'updated_at',label:'Updated at'}
+];
+const customerUpdateFields=[
+  {name:'status',label:'Status',as:'select',options:activeOptions}
+];
+const customerListFields=[
+  {name:'customer_id',label:'Customer ID'},
+  {name:'name',label:'Customer name'},
+  {name:'phone',label:'Phone'},
+  {name:'email',label:'Email'},
+  {name:'status',label:'Status'},
+  {name:'latitude',label:'Latitude'},
+  {name:'longitude',label:'Longitude'},
+  {name:'created_at',label:'Created at'},
+  {name:'updated_at',label:'Updated at'}
+];
+const tableListFields=[
+  {name:'table_id',label:'Table ID'},
+  {name:'branch_name',label:'Branch'},
+  {name:'table_number',label:'Table number'},
+  {name:'capacity',label:'Capacity'},
+  {name:'status',label:'Status'},
+  {name:'created_at',label:'Created at'},
+  {name:'updated_at',label:'Updated at'}
+];
 export const registryConfigs = {
   branches:{singular:'Branch',title:'Branches',description:'Manage restaurant branches, ownership and map locations.',fields:[
-    {name:'branch_id',label:'Branch ID',required:false,placeholder:'Generated automatically'},{name:'restaurant_id',label:'Restaurant ID',placeholder:'e.g. REST-001'},{name:'name',label:'Branch name',placeholder:'e.g. Adajan Branch'},{name:'phone',label:'Phone number',placeholder:'+91 98765 43210'},{name:'address',label:'Address',as:'textarea'},{name:'latitude',label:'Latitude',type:'number'},{name:'longitude',label:'Longitude',type:'number'},{name:'distance_km',label:'Distance (KM)',type:'number',required:false},{name:'waiting_count',label:'Current waiting count',type:'number',required:false},{name:'status',label:'Status',as:'select',options:activeOptions}
+    {name:'restaurant_id',label:'Restaurant ID',type:'number',placeholder:'e.g. 1'},{name:'name',label:'Branch name',placeholder:'e.g. Admin Branch'},{name:'city',label:'City',placeholder:'e.g. Surat'},{name:'email',label:'Email address',type:'email'},{name:'phone',label:'Phone number'},{name:'latitude',label:'Latitude',type:'number',step:'any'},{name:'longitude',label:'Longitude',type:'number',step:'any'}
   ]},
   managers:{singular:'Manager',title:'Managers',description:'Assign managers to a specific restaurant branch.',fields:[
     {name:'manager_id',label:'Manager ID',required:false,placeholder:'Generated automatically'},{name:'user_id',label:'User ID',required:false,placeholder:'Generated automatically'},{name:'branch_id',label:'Branch ID',placeholder:'e.g. BR-001'},{name:'name',label:'Full name'},{name:'email',label:'Email address',type:'email'},{name:'phone',label:'Phone number'},{name:'status',label:'Status',as:'select',options:activeOptions}
@@ -21,34 +86,166 @@ export const registryConfigs = {
     {name:'customer_id',label:'Customer ID',required:false,placeholder:'Generated automatically'},{name:'user_id',label:'User ID',required:false,placeholder:'Generated automatically'},{name:'name',label:'Full name'},{name:'email',label:'Email address',type:'email',required:false},{name:'phone',label:'Phone number'},{name:'status',label:'Status',as:'select',options:activeOptions}
   ]},
   tables:{singular:'Table',title:'Restaurant tables',description:'Manage branch tables, capacity and live availability.',fields:[
-    {name:'table_id',label:'Table ID',required:false,placeholder:'Generated automatically'},{name:'branch_id',label:'Branch ID',placeholder:'e.g. BR-001'},{name:'table_number',label:'Table number',placeholder:'e.g. T-08'},{name:'capacity',label:'Capacity',type:'number'},{name:'status',label:'Status',as:'select',options:['AVAILABLE','OCCUPIED','DISABLED']}
-  ]},
-  tokens:{singular:'Device',title:'Device tokens',description:'Manage FCM tokens. One user may register multiple devices.',fields:[
-    {name:'token_id',label:'Token ID',required:false,placeholder:'Generated automatically'},{name:'user_id',label:'User ID'},{name:'device_type',label:'Device type',as:'select',options:['Android','Ios','Web']},{name:'device_id',label:'Device ID'},{name:'device_token',label:'FCM device token',as:'textarea'},{name:'created_at',label:'Created at',required:false}
+    {name:'branch_id',label:'Branch',as:'select',options:[]},{name:'table_number',label:'Table number',placeholder:'e.g. T9'},{name:'capacity',label:'Capacity',type:'number',min:1},{name:'status',label:'Status',as:'select',options:['AVAILABLE','OCCUPIED','DISABLED']}
   ]},
   restaurants:{singular:'Restaurant',title:'Restaurants',description:'Create, update and activate restaurant accounts.',fields:[
-    {name:'restaurant_id',label:'Restaurant ID',required:false,placeholder:'Generated automatically'},{name:'name',label:'Restaurant name'},{name:'email',label:'Email address',type:'email'},{name:'phone',label:'Phone number'},{name:'address',label:'Address',as:'textarea'},{name:'status',label:'Status',as:'select',options:activeOptions}
+    {name:'name',label:'Owner name',placeholder:'e.g. Restaurant Owner'},{name:'email',label:'Owner email',type:'email'},{name:'phone',label:'Owner phone'},{name:'password',label:'Login password',type:'password',minLength:8,placeholder:'Minimum 8 characters'},{name:'restaurant_name',label:'Restaurant name',placeholder:'e.g. Spice Hub'},{name:'restaurant_description',label:'Description',as:'textarea'},{name:'restaurant_phone',label:'Restaurant phone'},{name:'restaurant_address',label:'Restaurant address',as:'textarea'},{name:'logo',label:'Restaurant logo',type:'file',accept:'image/*',required:false}
   ]}
 };
 
 const pretty=value=>value===undefined||value===null||value===''?'—':String(value);
+const mediaUrl=value=>!value?'':/^https?:\/\//i.test(value)?value:`${API_BASE_URL}${value.startsWith('/')?'':'/'}${value}`;
+const renderRegistryValue=(field,value)=>{
+  if(field.name==='status')return <span className={`registry-status ${String(value).toLowerCase()}`}>{pretty(value)}</span>;
+  if(field.name==='queue_enabled')return <span className={`registry-status ${value?'active':'inactive'}`}>{value?'Enabled':'Disabled'}</span>;
+  if(['created_at','updated_at'].includes(field.name))return value?new Date(value).toLocaleString():'—';
+  if(field.name==='logo')return value?<img className="restaurant-logo-thumb" src={mediaUrl(value)} alt="Restaurant logo"/>:pretty(value);
+  return pretty(value);
+};
+
+const withoutPassword=account=>{if(!account)return account;const {password,...safeAccount}=account;return safeAccount};
+const normalizeRestaurant=row=>{
+  const owner=row.owner||row.user||{}; const {password,...safeRow}=row;
+  return {...safeRow,owner:withoutPassword(row.owner),user:withoutPassword(row.user),id:row.id||row.restaurant_id||crypto.randomUUID(),name:owner.name||row.owner_name||'',email:owner.email||row.owner_email||row.email||'',phone:owner.phone||row.owner_phone||row.phone||'',restaurant_name:row.restaurant_name||row.restaurant?.name||row.name||'',description:row.description||row.restaurant_description||'',restaurant_description:row.description||row.restaurant_description||'',restaurant_phone:row.restaurant_phone||row.restaurant?.phone||row.phone||'',restaurant_address:row.restaurant_address||row.address||'',logo:row.logo||row.image||'',createdAt:row.createdAt||row.created_at,updatedAt:row.updatedAt||row.updated_at};
+};
+const normalizeBranch=row=>({...row,id:row.id||row.branch_id||crypto.randomUUID(),restaurant_name:row.restaurant_name||row.restaurant?.name||'',createdAt:row.createdAt||row.created_at,updatedAt:row.updatedAt||row.updated_at});
+const normalizeManager=row=>({
+  ...row,
+  user:withoutPassword(row.user),
+  id:row.id||row.manager_id||crypto.randomUUID(),
+  name:row.user?.name||row.name||'',
+  email:row.user?.email||row.email||'',
+  phone:row.user?.phone||row.phone||'',
+  restaurant_name:row.restaurant?.name||row.restaurant_name||'',
+  branch_name:row.branch?.name||row.branch_name||'',
+  createdAt:row.createdAt||row.created_at,
+  updatedAt:row.updatedAt||row.updated_at
+});
+const normalizeCustomer=row=>({
+  ...row,
+  user:withoutPassword(row.user),
+  id:row.id||row.customer_id||crypto.randomUUID(),
+  name:row.name||row.user?.name||'',
+  email:row.email||row.user?.email||'',
+  phone:row.phone||row.user?.phone||'',
+  createdAt:row.createdAt||row.created_at,
+  updatedAt:row.updatedAt||row.updated_at
+});
+const normalizeTable=row=>({
+  ...row,
+  id:row.id||row.table_id||crypto.randomUUID(),
+  branch_name:row.branch?.name||row.branch_name||'',
+  createdAt:row.createdAt||row.created_at,
+  updatedAt:row.updatedAt||row.updated_at
+});
 
 export default function RegistryPage({ kind, readOnly=false, title, description }) {
   const config=registryConfigs[kind]; const toast=useToast(); const {user}=useAuth();
-  const [rows,setRows]=useState([]); const [loading,setLoading]=useState(true); const [mode,setMode]=useState(null); const [active,setActive]=useState(null);
-  const load=()=>{setLoading(true);entityService.list(kind).then(data=>{setRows(data);setLoading(false)})};
-  useEffect(load,[kind]);
-  const save=async values=>{
-    if(kind==='customers'&&mode==='add'){const existing=rows.find(row=>row.phone.replace(/\D/g,'')===values.phone.replace(/\D/g,''));if(existing){setActive(existing);setMode('view');toast('Existing customer found and reused.');return}}
-    const stamped={...values}; config.fields.filter(field=>field.name.endsWith('_id')).forEach(field=>{if(!stamped[field.name]) stamped[field.name]=`${field.name.replace('_id','').toUpperCase()}-${Date.now().toString().slice(-6)}`});
-    if(kind==='branches'&&user.role===ROLES.RESTAURANT) stamped.restaurant_id=user.restaurant_id;
-    if(mode==='edit'){await entityService.update(kind,active.id,stamped);toast(`${config.singular} updated`)}else{await entityService.create(kind,stamped);toast(`${config.singular} created`)} setMode(null);load();
+  const [rows,setRows]=useState([]); const [loading,setLoading]=useState(true); const [mode,setMode]=useState(null); const [active,setActive]=useState(null); const [saving,setSaving]=useState(false); const [formError,setFormError]=useState(''); const [restaurantTotal,setRestaurantTotal]=useState(0); const [branchTotal,setBranchTotal]=useState(0); const [managerTotal,setManagerTotal]=useState(0); const [customerTotal,setCustomerTotal]=useState(0); const [tableTotal,setTableTotal]=useState(0); const [restaurantOptions,setRestaurantOptions]=useState([]); const [branchOptions,setBranchOptions]=useState([]);
+  const load=async(params={page:1,limit:10,search:''})=>{
+    setLoading(true);
+    try{
+      if(kind==='restaurants'){
+        const response=await restaurantApi.list(params);const data=response?.data??response;const restaurants=Array.isArray(data)?data:data?.restaurants||data?.items||data?.rows||data?.records||data?.data||[];const pagination=data?.pagination||data?.meta||response?.pagination||response?.meta||{};
+        setRows(restaurants.map(normalizeRestaurant));setRestaurantTotal(Number(pagination.total??pagination.totalRecords??pagination.totalItems??data?.total??response?.total??restaurants.length));
+      }else if(kind==='branches'){
+        const response=await branchApi.list(params);const data=response?.data??response;const branches=Array.isArray(data)?data:data?.branches||data?.items||data?.rows||data?.records||data?.data||[];const pagination=data?.pagination||data?.meta||response?.pagination||response?.meta||{};
+        setRows(branches.map(normalizeBranch));setBranchTotal(Number(pagination.total??pagination.totalRecords??pagination.totalItems??data?.total??response?.total??branches.length));
+      }else if(kind==='managers'){
+        const response=await managerApi.list(params);const data=response?.data??response;const managers=Array.isArray(data)?data:data?.managers||data?.items||data?.rows||data?.records||data?.data||[];const pagination=data?.pagination||data?.meta||response?.pagination||response?.meta||{};
+        setRows(managers.map(normalizeManager));setManagerTotal(Number(pagination.total??pagination.totalRecords??pagination.totalItems??data?.total??response?.total??managers.length));
+      }else if(kind==='customers'){
+        const response=await customerApi.list(params);const data=response?.data??response;const customers=Array.isArray(data)?data:data?.customers||data?.items||data?.rows||data?.records||data?.data||[];const pagination=data?.pagination||data?.meta||response?.pagination||response?.meta||{};
+        setRows(customers.map(normalizeCustomer));setCustomerTotal(Number(pagination.total??pagination.totalRecords??pagination.totalItems??data?.total??response?.total??customers.length));
+      }else if(kind==='tables'){
+        const response=await tableApi.list(params);const data=response?.data??response;const tables=Array.isArray(data)?data:data?.tables||data?.items||data?.rows||data?.records||data?.data||[];const pagination=data?.pagination||data?.meta||response?.pagination||response?.meta||{};
+        setRows(tables.map(normalizeTable));setTableTotal(Number(pagination.total??pagination.totalRecords??pagination.totalItems??data?.total??response?.total??tables.length));
+      }else setRows(await entityService.list(kind));
+    }catch(error){setRows([]);if(kind==='restaurants')setRestaurantTotal(0);if(kind==='branches')setBranchTotal(0);if(kind==='managers')setManagerTotal(0);if(kind==='customers')setCustomerTotal(0);if(kind==='tables')setTableTotal(0);toast(error.message)}finally{setLoading(false)}
   };
-  const displayFields=useMemo(()=>config.fields.filter(field=>!['address','device_token','created_at'].includes(field.name)),[config]);
-  const columns=[...displayFields.map(field=>({key:field.name,label:field.label,render:value=>field.name==='status'?<span className={`registry-status ${String(value).toLowerCase()}`}>{pretty(value)}</span>:pretty(value)})),{key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="View" onClick={()=>{setActive(row);setMode('view')}}><Eye/></button>{!readOnly&&<button title="Edit" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button>}</div>}];
+  useEffect(()=>{load()},[kind]);
+  useEffect(()=>{
+    if(kind!=='branches')return;
+    let current=true;
+    const loadRestaurantOptions=async()=>{
+      try{
+        const response=await restaurantApi.list({page:1,limit:100,search:''});const data=response?.data??response;const restaurants=Array.isArray(data)?data:data?.restaurants||data?.items||data?.rows||data?.records||data?.data||[];
+        if(current)setRestaurantOptions(restaurants.map(row=>({value:String(row.restaurant_id||row.id),label:`${row.restaurant_name||row.name||'Restaurant'} (ID: ${row.restaurant_id||row.id})`})));
+      }catch(error){if(current)toast(error.message)}
+    };
+    loadRestaurantOptions();
+    return()=>{current=false};
+  },[kind]);
+  useEffect(()=>{
+    if(kind!=='tables')return;
+    let current=true;
+    const loadBranchOptions=async()=>{
+      try{
+        const response=await branchApi.list({page:1,limit:100,search:''});const data=response?.data??response;const branches=Array.isArray(data)?data:data?.branches||data?.items||data?.rows||data?.records||data?.data||[];
+        if(current)setBranchOptions(branches.map(row=>({value:String(row.branch_id||row.id),label:`${row.name||row.branch_name||'Branch'} (ID: ${row.branch_id||row.id})`})));
+      }catch(error){if(current)toast(error.message)}
+    };
+    loadBranchOptions();
+    return()=>{current=false};
+  },[kind]);
+  useEffect(()=>{setFormError('')},[mode]);
+  const save=async values=>{
+    setSaving(true); setFormError('');
+    try {
+      if(kind==='restaurants'&&mode==='add'){
+        const response=await restaurantApi.create(values); const restaurant=response?.data?.restaurant??response?.data??response;
+        const created={...values,...restaurant,id:restaurant?.id||restaurant?.restaurant_id||crypto.randomUUID(),password:'',logo:restaurant?.logo||''};
+        setRows(current=>[created,...current]); setRestaurantTotal(total=>total+1); toast('Restaurant created'); setMode(null); return;
+      }
+      if(kind==='restaurants'&&mode==='edit'){
+        const restaurantId=active.restaurant_id||active.id;
+        if(!restaurantId)throw new Error('Restaurant ID is missing.');
+        const response=await restaurantApi.update(restaurantId,values); const restaurant=response?.data?.restaurant??response?.data??response;
+        const updated=normalizeRestaurant({...active,...values,...restaurant,logo:restaurant?.logo||active.logo||''});
+        setRows(current=>current.map(row=>(row.restaurant_id||row.id)===restaurantId?updated:row)); toast('Restaurant updated'); setMode(null); return;
+      }
+      if(kind==='branches'&&mode==='add'){
+        const response=await branchApi.create(values);const branch=response?.data?.branch??response?.data??response;const created=normalizeBranch({...values,...branch});
+        setRows(current=>[created,...current]);setBranchTotal(total=>total+1);toast('Branch created');setMode(null);return;
+      }
+      if(kind==='branches'&&mode==='edit'){
+        const branchId=active.branch_id||active.id;if(!branchId)throw new Error('Branch ID is missing.');
+        const response=await branchApi.update(branchId,values);const branch=response?.data?.branch??response?.data??response;const updated=normalizeBranch({...active,...values,...branch});
+        setRows(current=>current.map(row=>(row.branch_id||row.id)===branchId?updated:row));toast('Branch updated');setMode(null);return;
+      }
+      if(kind==='customers'&&mode==='edit'){
+        const customerId=active.customer_id||active.id;if(!customerId)throw new Error('Customer ID is missing.');
+        const response=await customerApi.updateStatus(customerId,values.status);const customer=response?.data?.customer??response?.data??response;const updated=normalizeCustomer({...active,status:values.status,...customer});
+        setRows(current=>current.map(row=>(row.customer_id||row.id)===customerId?updated:row));toast('Customer status updated');setMode(null);return;
+      }
+      if(kind==='tables'&&mode==='add'){
+        const response=await tableApi.create(values);const table=response?.data?.table??response?.data??response;const selectedBranch=branchOptions.find(option=>String(option.value)===String(values.branch_id));const created=normalizeTable({...values,...table,branch_name:table?.branch?.name||selectedBranch?.label?.replace(/ \(ID:.*\)$/,'')||''});
+        setRows(current=>[created,...current]);setTableTotal(total=>total+1);toast('Table created');setMode(null);return;
+      }
+      const stamped={...values}; config.fields.filter(field=>field.name.endsWith('_id')).forEach(field=>{if(!stamped[field.name]) stamped[field.name]=`${field.name.replace('_id','').toUpperCase()}-${Date.now().toString().slice(-6)}`});
+      if(mode==='edit'){await entityService.update(kind,active.id,stamped);toast(`${config.singular} updated`)}else{await entityService.create(kind,stamped);toast(`${config.singular} created`)} setMode(null);load();
+    } catch(error) {
+      setFormError(error.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+  const restaurantEditFields=useMemo(()=>[
+    ...config.fields.map(field=>field.name==='password'?{...field,required:false,placeholder:'Leave blank to keep current password'}:field),
+    {name:'status',label:'Status',as:'select',options:activeOptions}
+  ],[config]);
+  const branchCreateFields=useMemo(()=>config.fields.map(field=>field.name==='restaurant_id'?{...field,label:'Restaurant',as:'select',type:undefined,options:[{value:'',label:'Select restaurant'},...restaurantOptions]}:field),[config,restaurantOptions]);
+  const tableCreateFields=useMemo(()=>config.fields.map(field=>field.name==='branch_id'?{...field,options:[{value:'',label:'Select branch'},...branchOptions]}:field),[config,branchOptions]);
+  const formFields=kind==='restaurants'&&mode==='edit'?restaurantEditFields:kind==='branches'&&mode==='edit'?branchUpdateFields:kind==='branches'?branchCreateFields:kind==='customers'?customerUpdateFields:kind==='tables'?tableCreateFields:config.fields;
+  const detailFields=kind==='restaurants'?config.fields.filter(field=>field.name!=='password'):kind==='branches'?branchListFields.filter(field=>!['created_at','updated_at'].includes(field.name)):config.fields;
+  const displayFields=useMemo(()=>{if(kind==='branches')return branchListFields;if(kind==='managers')return managerListFields;if(kind==='customers')return customerListFields;if(kind==='tables')return tableListFields;const fields=config.fields.filter(field=>!['address','device_token','created_at','password'].includes(field.name));return kind==='restaurants'?[...fields,{name:'status',label:'Status'}]:fields},[config,kind]);
+  const dataColumns=displayFields.map(field=>({key:field.name,label:field.label,render:value=>renderRegistryValue(field,value)}));
+  const actionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="View" onClick={()=>{setActive(row);setMode('view')}}><Eye/></button>{!readOnly&&<button title="Edit" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button>}</div>};
+  const customerActionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="Update status" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button></div>};
+  const columns=['managers','tables'].includes(kind)?dataColumns:kind==='customers'?[...dataColumns,customerActionColumn]:[...dataColumns,actionColumn];
   const visibleRows=user.role===ROLES.MANAGER&&kind==='tables'?rows.filter(row=>row.branch_id===user.branch_id):user.role===ROLES.RESTAURANT&&kind==='branches'?rows.filter(row=>row.restaurant_id===user.restaurant_id):rows;
-  return <><PageHeader eyebrow="OPERATIONS" title={title||config.title} description={description||config.description} action={!readOnly&&<button className="btn primary" onClick={()=>{setActive(null);setMode('add')}}><Plus size={17}/> Add {config.singular}</button>}/><CommonTable columns={columns} data={visibleRows} loading={loading} searchPlaceholder={`Search ${config.title.toLowerCase()}…`}/>
-    <Modal open={mode==='add'||mode==='edit'} title={`${mode==='edit'?'Edit':'Add'} ${config.singular}`} onClose={()=>setMode(null)} size="wide"><EntityForm initial={mode==='edit'?active:null} fields={config.fields} onCancel={()=>setMode(null)} onSubmit={save} submitLabel={mode==='edit'?'Save changes':`Add ${config.singular}`}/></Modal>
-    <Modal open={mode==='view'} title={`${config.singular} details`} onClose={()=>setMode(null)} size="wide"><div className="registry-detail">{config.fields.map(field=><div key={field.name}><span>{field.label}</span><strong>{pretty(active?.[field.name])}</strong></div>)}<div><span>Created at</span><strong>{active?.createdAt?new Date(active.createdAt).toLocaleString():'—'}</strong></div><div><span>Updated at</span><strong>{active?.updatedAt?new Date(active.updatedAt).toLocaleString():'—'}</strong></div></div><footer className="modal-actions"><button className="btn secondary" onClick={()=>setMode(null)}>Close</button>{!readOnly&&<button className="btn primary" onClick={()=>setMode('edit')}><Pencil size={16}/> Edit</button>}</footer></Modal>
+  return <><PageHeader eyebrow="OPERATIONS" title={title||config.title} description={description||config.description} action={!readOnly&&!['managers','customers'].includes(kind)&&<button className="btn primary" onClick={()=>{setActive(null);setMode('add')}}><Plus size={17}/> Add {config.singular}</button>}/>{kind==='restaurants'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={restaurantTotal} onQueryChange={load} searchPlaceholder="Search restaurants"/>:kind==='branches'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={branchTotal} onQueryChange={load} searchPlaceholder="Search branches" minWidth={2100}/>:kind==='managers'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={managerTotal} onQueryChange={load} searchPlaceholder="Search managers" minWidth={1500}/>:kind==='customers'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={customerTotal} onQueryChange={load} searchPlaceholder="Search customers" minWidth={1200}/>:kind==='tables'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={tableTotal} onQueryChange={load} searchPlaceholder="Search tables" minWidth={900}/>:<CommonTable columns={columns} data={visibleRows} loading={loading} searchPlaceholder={`Search ${config.title.toLowerCase()}…`}/>}
+    <Modal open={mode==='add'||mode==='edit'} title={`${mode==='edit'?'Edit':'Add'} ${config.singular}`} onClose={()=>{if(!saving)setMode(null)}} size="wide"><EntityForm initial={mode==='edit'?active:null} fields={formFields} onCancel={()=>setMode(null)} onSubmit={save} onFormChange={()=>setFormError('')} submitLabel={mode==='edit'?'Save changes':`Add ${config.singular}`} busy={saving} formError={formError}/></Modal>
+    <Modal open={mode==='view'} title={`${config.singular} details`} onClose={()=>setMode(null)} size="wide"><div className="registry-detail">{detailFields.map(field=><div key={field.name}><span>{field.label}</span><strong>{renderRegistryValue(field,active?.[field.name])}</strong></div>)}<div><span>Created at</span><strong>{active?.createdAt?new Date(active.createdAt).toLocaleString():'—'}</strong></div><div><span>Updated at</span><strong>{active?.updatedAt?new Date(active.updatedAt).toLocaleString():'—'}</strong></div></div><footer className="modal-actions"><button className="btn secondary" onClick={()=>setMode(null)}>Close</button>{!readOnly&&<button className="btn primary" onClick={()=>setMode('edit')}><Pencil size={16}/> Edit</button>}</footer></Modal>
   </>;
 }
