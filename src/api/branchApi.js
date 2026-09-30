@@ -33,7 +33,6 @@ export const branchApi = {
       limit: String(limit),
       search,
     }).toString();
-
     if (!listRequests.has(query)) {
       const request = apiClient
         .get(`/api/v1/admin/branches?${query}`)
