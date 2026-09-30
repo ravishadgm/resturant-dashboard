@@ -47,12 +47,6 @@ export default function Login() {
         </div>
         {error && <div className="login-error">{error}</div>}
         <form onSubmit={submit}>
-          <div className="login-role-switch" role="group" aria-label="Account type">
-            <button type="button" className={accountType === ROLES.SUPER_ADMIN ? 'active' : ''} aria-pressed={accountType === ROLES.SUPER_ADMIN} disabled={busy} onClick={() => setAccountType(ROLES.SUPER_ADMIN)}><ShieldCheck /> Admin</button>
-            <button type="button" className={accountType === ROLES.RESTAURANT ? 'active' : ''} aria-pressed={accountType === ROLES.RESTAURANT} disabled={busy} onClick={() => setAccountType(ROLES.RESTAURANT)}><Building2 /> Restaurant</button>
-            <button type="button" className={accountType === ROLES.MANAGER ? 'active' : ''} aria-pressed={accountType === ROLES.MANAGER} disabled={busy} onClick={() => setAccountType(ROLES.MANAGER)}><UserRoundCog /> Manager</button>
-            <button type="button" className={accountType === ROLES.CUSTOMER ? 'active' : ''} aria-pressed={accountType === ROLES.CUSTOMER} disabled={busy} onClick={() => setAccountType(ROLES.CUSTOMER)}><UserRound /> Customer</button>
-          </div>
           <label className="login-field">
             <span>Email</span>
             <div><Mail /><input autoFocus autoComplete="username" type="email" placeholder="you@example.com" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} /></div>
