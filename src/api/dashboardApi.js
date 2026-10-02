@@ -4,6 +4,8 @@ import { STORAGE_KEYS } from '../utils/constants';
 
 let adminDashboardRequest = null;
 let adminDashboardToken = null;
+let restaurantDashboardRequest = null;
+let restaurantDashboardToken = null;
 
 const getAdminDashboard = () => {
   const token = storage.get(STORAGE_KEYS.authToken);
@@ -21,6 +23,23 @@ const getAdminDashboard = () => {
   return adminDashboardRequest;
 };
 
+const getRestaurantDashboard = () => {
+  const token = storage.get(STORAGE_KEYS.authToken);
+
+  if (!restaurantDashboardRequest || token !== restaurantDashboardToken) {
+    restaurantDashboardToken = token;
+    restaurantDashboardRequest = apiClient
+      .get('/api/v1/restaurant/dashboard')
+      .catch((error) => {
+        restaurantDashboardRequest = null;
+        throw error;
+      });
+  }
+
+  return restaurantDashboardRequest;
+};
+
 export const dashboardApi = {
   getAdminDashboard,
+  getRestaurantDashboard,
 };

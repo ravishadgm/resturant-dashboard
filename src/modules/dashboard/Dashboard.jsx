@@ -8,7 +8,9 @@ import { ROLES } from '../../utils/constants';
 export default function Dashboard() {
   const { user } = useAuth();
   const isSuperAdmin = user.role === ROLES.SUPER_ADMIN;
+  const isRestaurant = user.role === ROLES.RESTAURANT;
   const [counts, setCounts] = useState({ users:0, managers:0, restaurants:0, branches:0, customers:0, tables:0, queue:0 });
+  const [restaurantName, setRestaurantName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -29,6 +31,20 @@ export default function Dashboard() {
             restaurants: Number(data?.restaurants ?? 0),
             branches: Number(data?.branches ?? 0),
             queue: Number(data?.todayQueue ?? 0),
+          }));
+          return;
+        }
+
+        if (isRestaurant) {
+          const response = await dashboardApi.getRestaurantDashboard();
+          const data = response?.data ?? response;
+          if (!active) return;
+          setRestaurantName(data?.name ?? '');
+          setCounts(previous => ({
+            ...previous,
+            managers: Number(data?.managers ?? 0),
+            branches: Number(data?.branches ?? 0),
+            tables: Number(data?.tables ?? 0),
           }));
           return;
         }
@@ -55,7 +71,7 @@ export default function Dashboard() {
 
     loadDashboard();
     return () => { active = false; };
-  }, [isSuperAdmin]);
+  }, [isSuperAdmin, isRestaurant]);
 
   const roleStats={
     [ROLES.SUPER_ADMIN]:[[Users,'Users',counts.users,'Registered users','violet'],[Store,'Restaurants',counts.restaurants,'Restaurant accounts','blue'],[Building2,'Branches',counts.branches,'All locations','green'],[ListOrdered,"Today's queue",counts.queue,'Active today','violet']],
@@ -64,13 +80,14 @@ export default function Dashboard() {
     [ROLES.CUSTOMER]:[[MapPin,'Nearby branches',counts.branches,'Location based','violet'],[ListOrdered,'Waiting parties',counts.queue,'Current business day','blue']]
   };
   const stats=roleStats[user.role]||roleStats[ROLES.CUSTOMER];
+  const displayName=isRestaurant&&restaurantName?restaurantName:(user.name||'User').split(' ')[0];
 
   return (
     <>
       <div className="dashboard-welcome">
         <div>
           <span>{new Intl.DateTimeFormat('en-IN',{weekday:'long',day:'numeric',month:'long'}).format(new Date()).toUpperCase()}</span>
-          <h1>Good morning, {(user.name || 'User').split(' ')[0]}.</h1>
+          <h1>Good morning, {displayName}.</h1>
           <p>Here’s an overview of your workspace.</p>
         </div>
       </div>
