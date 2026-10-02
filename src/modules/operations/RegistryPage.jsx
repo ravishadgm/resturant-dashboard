@@ -87,6 +87,17 @@ const tableListFields=[
   {name:'created_at',label:'Created at'},
   {name:'updated_at',label:'Updated at'}
 ];
+const restaurantListFields=[
+  {name:'logo',label:'Logo'},
+  {name:'restaurant_name',label:'Restaurant name'},
+  {name:'restaurant_description',label:'Description'},
+  {name:'restaurant_phone',label:'Restaurant phone'},
+  {name:'restaurant_address',label:'Restaurant address'},
+  {name:'name',label:'Owner name'},
+  {name:'email',label:'Owner email'},
+  {name:'phone',label:'Owner phone'},
+  {name:'status',label:'Status'}
+];
 export const registryConfigs = {
   branches:{singular:'Branch',title:'Branches',description:'Manage restaurant branches, ownership and map locations.',fields:[
     {name:'restaurant_id',label:'Restaurant ID',type:'number',placeholder:'e.g. 1'},{name:'name',label:'Branch name',placeholder:'e.g. Admin Branch'},{name:'city',label:'City',placeholder:'e.g. Surat'},{name:'email',label:'Email address',type:'email'},{name:'phone',label:'Phone number'},{name:'latitude',label:'Latitude',type:'number',step:'any'},{name:'longitude',label:'Longitude',type:'number',step:'any'}
@@ -231,7 +242,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
     try {
       if(kind==='restaurants'&&mode==='add'){
         const response=await restaurantApi.create(values); const restaurant=response?.data?.restaurant??response?.data??response;
-        const created={...values,...restaurant,id:restaurant?.id||restaurant?.restaurant_id||crypto.randomUUID(),password:'',logo:restaurant?.logo||''};
+        const created=normalizeRestaurant({...restaurant,owner:restaurant?.owner||{name:values.name,email:values.email,phone:values.phone},restaurant_name:restaurant?.restaurant_name||restaurant?.name||values.restaurant_name,restaurant_description:restaurant?.description||restaurant?.restaurant_description||values.restaurant_description,restaurant_phone:restaurant?.restaurant_phone||values.restaurant_phone,restaurant_address:restaurant?.address||restaurant?.restaurant_address||values.restaurant_address,logo:restaurant?.logo||'',id:restaurant?.id||restaurant?.restaurant_id||crypto.randomUUID()});
         setRows(current=>[created,...current]); setRestaurantTotal(total=>total+1); toast('Restaurant created'); setMode(null); return;
       }
       if(kind==='restaurants'&&mode==='edit'){
@@ -288,7 +299,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const formFields=kind==='restaurants'&&mode==='edit'?restaurantEditFields:kind==='branches'&&branchScope==='restaurant'&&mode==='edit'?restaurantBranchEditFields:kind==='branches'&&branchScope==='restaurant'?restaurantBranchCreateFields:kind==='branches'&&mode==='edit'?branchUpdateFields:kind==='branches'?branchCreateFields:kind==='managers'&&branchScope==='restaurant'?managerCreateFormFields:kind==='customers'?customerUpdateFields:kind==='tables'?tableCreateFields:config.fields;
   const formInitial=mode==='edit'?active:null;
   const detailFields=kind==='restaurants'?config.fields.filter(field=>field.name!=='password'):kind==='branches'?branchListFields.filter(field=>!['created_at','updated_at'].includes(field.name)):config.fields;
-  const displayFields=useMemo(()=>{if(kind==='branches')return branchScope==='admin'?branchListFields.filter(field=>field.name!=='address'):branchListFields;if(kind==='managers')return managerListFields;if(kind==='customers')return customerListFields;if(kind==='tables')return tableListFields;const fields=config.fields.filter(field=>!['address','device_token','created_at','password'].includes(field.name));return kind==='restaurants'?[...fields,{name:'status',label:'Status'}]:fields},[config,kind,branchScope]);
+  const displayFields=useMemo(()=>{if(kind==='restaurants')return restaurantListFields;if(kind==='branches')return branchScope==='admin'?branchListFields.filter(field=>field.name!=='address'):branchListFields;if(kind==='managers')return managerListFields;if(kind==='customers')return customerListFields;if(kind==='tables')return tableListFields;return config.fields.filter(field=>!['address','device_token','created_at','password'].includes(field.name))},[config,kind,branchScope]);
   const dataColumns=displayFields.map(field=>({key:field.name,label:field.label,render:value=>renderRegistryValue(field,value)}));
   const actionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="View" onClick={()=>{setActive(row);setMode('view')}}><Eye/></button>{!readOnly&&<button title="Edit" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button>}</div>};
   const customerActionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="Update status" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button></div>};
