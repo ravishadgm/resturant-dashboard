@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Eye, Pencil, Plus } from 'lucide-react';
 import CommonTable from '../../components/common/CommonTable';
 import ServerTable from '../../components/common/ServerTable';
@@ -88,14 +88,14 @@ const tableListFields=[
   {name:'updated_at',label:'Updated at'}
 ];
 const restaurantListFields=[
-  {name:'logo',label:'Logo'},
+  {name:'name',label:'Name'},
+  {name:'email',label:'Email'},
+  {name:'phone',label:'Phone'},
   {name:'restaurant_name',label:'Restaurant name'},
-  {name:'restaurant_description',label:'Description'},
+  {name:'restaurant_description',label:'Restaurant description'},
   {name:'restaurant_phone',label:'Restaurant phone'},
   {name:'restaurant_address',label:'Restaurant address'},
-  {name:'name',label:'Owner name'},
-  {name:'email',label:'Owner email'},
-  {name:'phone',label:'Owner phone'},
+  {name:'logo',label:'Logo'},
   {name:'status',label:'Status'}
 ];
 export const registryConfigs = {
@@ -112,7 +112,7 @@ export const registryConfigs = {
     {name:'branch_id',label:'Branch',as:'select',options:[]},{name:'table_number',label:'Table number',placeholder:'e.g. T9'},{name:'capacity',label:'Capacity',type:'number',min:1},{name:'status',label:'Status',as:'select',options:['AVAILABLE','OCCUPIED','DISABLED']}
   ]},
   restaurants:{singular:'Restaurant',title:'Restaurants',description:'Create, update and activate restaurant accounts.',fields:[
-    {name:'name',label:'Owner name',placeholder:'e.g. Restaurant Owner'},{name:'email',label:'Owner email',type:'email'},{name:'phone',label:'Owner phone'},{name:'password',label:'Login password',type:'password',minLength:8,placeholder:'Minimum 8 characters'},{name:'restaurant_name',label:'Restaurant name',placeholder:'e.g. Spice Hub'},{name:'restaurant_description',label:'Description',as:'textarea'},{name:'restaurant_phone',label:'Restaurant phone'},{name:'restaurant_address',label:'Restaurant address',as:'textarea'},{name:'logo',label:'Restaurant logo',type:'file',accept:'image/*',required:false}
+    {name:'name',label:'Name',placeholder:'e.g. Restaurant Owner'},{name:'email',label:'Email',type:'email'},{name:'phone',label:'Phone'},{name:'password',label:'Password',type:'password',minLength:8,placeholder:'Minimum 8 characters'},{name:'restaurant_name',label:'Restaurant name',placeholder:'e.g. Spice Hub'},{name:'restaurant_description',label:'Restaurant description',as:'textarea'},{name:'restaurant_phone',label:'Restaurant phone'},{name:'restaurant_address',label:'Restaurant address',as:'textarea'},{name:'logo',label:'Logo',type:'file',accept:'image/*',required:false}
   ]}
 };
 
@@ -167,7 +167,9 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const branchScope=user.role===ROLES.RESTAURANT?'restaurant':'admin';
   const loggedInRestaurantId=String(user.restaurant_id||user.restaurant?.restaurant_id||user.user_id||'');
   const [rows,setRows]=useState([]); const [loading,setLoading]=useState(true); const [mode,setMode]=useState(null); const [active,setActive]=useState(null); const [saving,setSaving]=useState(false); const [formError,setFormError]=useState(''); const [restaurantTotal,setRestaurantTotal]=useState(0); const [branchTotal,setBranchTotal]=useState(0); const [managerTotal,setManagerTotal]=useState(0); const [customerTotal,setCustomerTotal]=useState(0); const [tableTotal,setTableTotal]=useState(0); const [restaurantOptions,setRestaurantOptions]=useState([]); const [branchOptions,setBranchOptions]=useState([]); const [managerBranchId,setManagerBranchId]=useState(''); const [tableBranchId,setTableBranchId]=useState('');
+  const lastQueryRef=useRef({page:1,limit:10,search:''});
   const load=async(params={page:1,limit:10,search:''},selectedManagerBranchId=managerBranchId,selectedTableBranchId=tableBranchId)=>{
+    lastQueryRef.current=params;
     setLoading(true);
     try{
       if(kind==='restaurants'){
@@ -237,47 +239,51 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
       return option?{...row,restaurant_name:option.label.replace(/ \(ID:.*\)$/,'')}:row;
     }));
   },[kind,restaurantOptions]);
+  const refreshAfterSave=async message=>{
+    setMode(null);
+    setActive(null);
+    await load(lastQueryRef.current,managerBranchId,tableBranchId);
+    toast(message);
+  };
   const save=async values=>{
     setSaving(true); setFormError('');
     try {
       if(kind==='restaurants'&&mode==='add'){
-        const response=await restaurantApi.create(values); const restaurant=response?.data?.restaurant??response?.data??response;
-        const created=normalizeRestaurant({...restaurant,owner:restaurant?.owner||{name:values.name,email:values.email,phone:values.phone},restaurant_name:restaurant?.restaurant_name||restaurant?.name||values.restaurant_name,restaurant_description:restaurant?.description||restaurant?.restaurant_description||values.restaurant_description,restaurant_phone:restaurant?.restaurant_phone||values.restaurant_phone,restaurant_address:restaurant?.address||restaurant?.restaurant_address||values.restaurant_address,logo:restaurant?.logo||'',id:restaurant?.id||restaurant?.restaurant_id||crypto.randomUUID()});
-        setRows(current=>[created,...current]); setRestaurantTotal(total=>total+1); toast('Restaurant created'); setMode(null); return;
+        await restaurantApi.create(values);
+        await refreshAfterSave('Restaurant created'); return;
       }
       if(kind==='restaurants'&&mode==='edit'){
         const restaurantId=active.restaurant_id||active.id;
         if(!restaurantId)throw new Error('Restaurant ID is missing.');
-        const response=await restaurantApi.update(restaurantId,values); const restaurant=response?.data?.restaurant??response?.data??response;
-        const updated=normalizeRestaurant({...active,...values,...restaurant,logo:restaurant?.logo||active.logo||''});
-        setRows(current=>current.map(row=>(row.restaurant_id||row.id)===restaurantId?updated:row)); toast('Restaurant updated'); setMode(null); return;
+        await restaurantApi.update(restaurantId,values);
+        await refreshAfterSave('Restaurant updated'); return;
       }
       if(kind==='branches'&&mode==='add'){
         const branchValues=branchScope==='restaurant'?{...values,restaurant_id:loggedInRestaurantId}:values;
-        const response=await branchApi.create(branchValues,branchScope);const branch=response?.data?.branch??response?.data??response;const selectedRestaurant=restaurantOptions.find(option=>String(option.value)===String(branchValues.restaurant_id));const restaurantName=branch?.restaurant?.name||branch?.restaurant_name||selectedRestaurant?.label?.replace(/ \(ID:.*\)$/,'')||user.restaurant_name||user.restaurant?.name||user.name||'';const created=normalizeBranch({...branchValues,...branch,restaurant_name:restaurantName});
-        setRows(current=>[created,...current]);setBranchTotal(total=>total+1);toast('Branch created');setMode(null);return;
+        await branchApi.create(branchValues,branchScope);
+        await refreshAfterSave('Branch created');return;
       }
       if(kind==='branches'&&mode==='edit'){
         const branchId=active.branch_id||active.id;if(!branchId)throw new Error('Branch ID is missing.');
         const branchValues=branchScope==='restaurant'?{...values,restaurant_id:loggedInRestaurantId}:values;
-        const response=await branchApi.update(branchId,branchValues,branchScope);const branch=response?.data?.branch??response?.data??response;const updated=normalizeBranch({...active,...branchValues,...branch});
-        setRows(current=>current.map(row=>(row.branch_id||row.id)===branchId?updated:row));toast('Branch updated');setMode(null);return;
+        await branchApi.update(branchId,branchValues,branchScope);
+        await refreshAfterSave('Branch updated');return;
       }
       if(kind==='managers'&&mode==='add'&&branchScope==='restaurant'){
-        const response=await managerApi.create(values);const manager=response?.data?.manager??response?.data??response;const selectedBranch=branchOptions.find(option=>String(option.value)===String(values.branch_id));const created=normalizeManager({...values,...manager,branch_name:manager?.branch?.name||selectedBranch?.label?.replace(/ \(ID:.*\)$/,'')||''});
-        setRows(current=>[created,...current]);setManagerTotal(total=>total+1);toast('Manager created');setMode(null);return;
+        await managerApi.create(values);
+        await refreshAfterSave('Manager created');return;
       }
       if(kind==='customers'&&mode==='edit'){
         const customerId=active.customer_id||active.id;if(!customerId)throw new Error('Customer ID is missing.');
-        const response=await customerApi.updateStatus(customerId,values.status);const customer=response?.data?.customer??response?.data??response;const updated=normalizeCustomer({...active,status:values.status,...customer});
-        setRows(current=>current.map(row=>(row.customer_id||row.id)===customerId?updated:row));toast('Customer status updated');setMode(null);return;
+        await customerApi.updateStatus(customerId,values.status);
+        await refreshAfterSave('Customer status updated');return;
       }
       if(kind==='tables'&&mode==='add'){
-        const response=await tableApi.create(values,branchScope);const table=response?.data?.table??response?.data??response;const selectedBranch=branchOptions.find(option=>String(option.value)===String(values.branch_id));const created=normalizeTable({...values,...table,branch_name:table?.branch?.name||selectedBranch?.label?.replace(/ \(ID:.*\)$/,'')||''});
-        setRows(current=>[created,...current]);setTableTotal(total=>total+1);toast('Table created');setMode(null);return;
+        await tableApi.create(values,branchScope);
+        await refreshAfterSave('Table created');return;
       }
       const stamped={...values}; config.fields.filter(field=>field.name.endsWith('_id')).forEach(field=>{if(!stamped[field.name]) stamped[field.name]=`${field.name.replace('_id','').toUpperCase()}-${Date.now().toString().slice(-6)}`});
-      if(mode==='edit'){await entityService.update(kind,active.id,stamped);toast(`${config.singular} updated`)}else{await entityService.create(kind,stamped);toast(`${config.singular} created`)} setMode(null);load();
+      if(mode==='edit'){await entityService.update(kind,active.id,stamped);await refreshAfterSave(`${config.singular} updated`)}else{await entityService.create(kind,stamped);await refreshAfterSave(`${config.singular} created`)}
     } catch(error) {
       setFormError(error.message);
     } finally {

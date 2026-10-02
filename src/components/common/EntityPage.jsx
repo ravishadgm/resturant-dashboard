@@ -24,12 +24,14 @@ export default function EntityPage({
   const toast = useToast();
   const load = () => {
     setLoading(true);
-    entityService.list(type).then((rows) => {
+    return entityService.list(type).then((rows) => {
       setData(rows);
       setTimeout(() => setLoading(false), 250);
     });
   };
-  useEffect(load, [type]);
+  useEffect(() => {
+    load();
+  }, [type]);
   const save = async (values) => {
     if (mode === "edit") {
       await entityService.update(type, active.id, values);
@@ -40,7 +42,7 @@ export default function EntityPage({
     }
     setMode(null);
     setActive(null);
-    load();
+    await load();
   };
   const remove = async () => {
     await entityService.delete(type, active.id);
