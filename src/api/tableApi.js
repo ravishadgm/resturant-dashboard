@@ -15,23 +15,28 @@ const createPayload = (details) => ({
 });
 
 export const tableApi = {
-  list: ({ page = 1, limit = 10, search = '' } = {}) => {
-    const query = new URLSearchParams({
+  list: ({ page = 1, limit = 10, search = '', branchId, scope = 'admin' } = {}) => {
+    const queryValues = {
       page: String(page),
       limit: String(limit),
       search,
-    }).toString();
+    };
+    if (scope === 'restaurant') queryValues.branch_id = String(branchId);
+    const query = new URLSearchParams(queryValues).toString();
+    const path = scope === 'restaurant' ? '/api/v1/restaurant/tables' : '/api/v1/admin/tables';
+    const requestKey = `${path}?${query}`;
 
-    if (!listRequests.has(query)) {
+    if (!listRequests.has(requestKey)) {
       const request = apiClient
-        .get(`/api/v1/admin/tables?${query}`)
-        .finally(() => listRequests.delete(query));
-      listRequests.set(query, request);
+        .get(requestKey)
+        .finally(() => listRequests.delete(requestKey));
+      listRequests.set(requestKey, request);
     }
 
-    return listRequests.get(query);
+    return listRequests.get(requestKey);
   },
-  create: (details) => apiClient
-    .post('/api/v1/admin/tables', createPayload(details))
-    .then(clearListRequests),
+  create: (details, scope = 'admin') => {
+    const path = scope === 'restaurant' ? '/api/v1/restaurant/tables' : '/api/v1/admin/tables';
+    return apiClient.post(path, createPayload(details)).then(clearListRequests);
+  },
 };

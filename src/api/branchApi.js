@@ -7,43 +7,71 @@ const clearListCache = (response) => {
   return response;
 };
 
-const createPayload = (details) => ({
-  restaurant_id: Number(details.restaurant_id),
-  name: details.name,
-  city: details.city,
-  email: details.email,
-  phone: details.phone,
-  latitude: Number(details.latitude),
-  longitude: Number(details.longitude),
-});
+const createPayload = (details, scope) => {
+  const payload = {
+    restaurant_id: Number(details.restaurant_id),
+    name: details.name,
+    city: details.city,
+    phone: details.phone,
+    latitude: Number(details.latitude),
+    longitude: Number(details.longitude),
+  };
+  if (scope === 'restaurant') payload.address = details.address;
+  else payload.email = details.email;
+  return payload;
+};
 
-const updatePayload = (details) => ({
-  name: details.name,
-  city: details.city,
-  email: details.email,
-  phone: details.phone,
-  latitude: Number(details.latitude),
-  longitude: Number(details.longitude),
-});
+const updatePayload = (details, scope) => {
+  const payload = {
+    name: details.name,
+    city: details.city,
+    phone: details.phone,
+    latitude: Number(details.latitude),
+    longitude: Number(details.longitude),
+  };
+  if (scope === 'restaurant') {
+    payload.restaurant_id = Number(details.restaurant_id);
+    payload.address = details.address;
+    if (details.queue_enabled !== undefined && details.queue_enabled !== '') {
+      payload.queue_enabled = details.queue_enabled === true || details.queue_enabled === 'true';
+    }
+  } else {
+    payload.email = details.email;
+  }
+  return payload;
+};
 
 export const branchApi = {
-  list: ({ page = 1, limit = 10, search = '' } = {}) => {
+  options: ({ scope = 'admin' } = {}) => {
+    const path = scope === 'restaurant' ? '/api/v1/restaurant/branches' : '/api/v1/admin/branches';
+    return apiClient.get(path);
+  },
+  list: ({ page = 1, limit = 10, search = '', scope = 'admin' } = {}) => {
     const query = new URLSearchParams({
       page: String(page),
       limit: String(limit),
       search,
     }).toString();
-    if (!listRequests.has(query)) {
+    const path = scope === 'restaurant' ? '/api/v1/restaurant/branches' : '/api/v1/admin/branches';
+    const requestKey = `${path}?${query}`;
+
+    if (!listRequests.has(requestKey)) {
       const request = apiClient
-        .get(`/api/v1/admin/branches?${query}`)
-        .finally(() => listRequests.delete(query));
-      listRequests.set(query, request);
+        .get(requestKey)
+        .finally(() => listRequests.delete(requestKey));
+      listRequests.set(requestKey, request);
     }
 
-    return listRequests.get(query);
+    return listRequests.get(requestKey);
   },
-  create: (details) => apiClient.post('/api/v1/admin/branches', createPayload(details)).then(clearListCache),
-  update: (branchId, details) => apiClient
-    .put(`/api/v1/admin/branches/${encodeURIComponent(branchId)}`, updatePayload(details))
-    .then(clearListCache),
+  create: (details, scope = 'admin') => {
+    const path = scope === 'restaurant' ? '/api/v1/restaurant/branches' : '/api/v1/admin/branches';
+    return apiClient.post(path, createPayload(details, scope)).then(clearListCache);
+  },
+  update: (branchId, details, scope = 'admin') => {
+    const path = scope === 'restaurant' ? '/api/v1/restaurant/branches' : '/api/v1/admin/branches';
+    return apiClient
+      .put(`${path}/${encodeURIComponent(branchId)}`, updatePayload(details, scope))
+      .then(clearListCache);
+  },
 };

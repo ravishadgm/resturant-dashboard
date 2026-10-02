@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext';
 import { ROLES } from '../utils/constants';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import Login from '../modules/auth/Login';
-import CustomerRegister from '../modules/auth/CustomerRegister';
 import Dashboard from '../modules/dashboard/Dashboard';
 import Queue from '../modules/queue/Queue';
 import RegistryPage from '../modules/operations/RegistryPage';
@@ -15,7 +14,6 @@ export default function AppRoutes(){
   const {user}=useAuth();
   return <Routes>
     <Route path="/login" element={user?<Navigate to="/dashboard" replace/>:<Login/>}/>
-    <Route path="/register" element={user?<Navigate to="/dashboard" replace/>:<CustomerRegister/>}/>
     <Route element={<ProtectedRoute/>}><Route element={<DashboardLayout/>}>
       <Route path="/dashboard" element={<Dashboard/>}/>
       <Route element={access([ROLES.SUPER_ADMIN])}><Route path="/restaurants" element={<RegistryPage kind="restaurants"/>}/></Route>
