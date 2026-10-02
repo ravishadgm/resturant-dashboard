@@ -50,7 +50,6 @@ const branchListFields=[
 ];
 const managerListFields=[
   {name:'manager_id',label:'Manager ID'},
-  {name:'branch_name',label:'Branch'},
   {name:'name',label:'Manager name'},
   {name:'email',label:'Email'},
   {name:'phone',label:'Phone'},
