@@ -26,7 +26,6 @@ const branchUpdateFields=[
   {name:'longitude',label:'Longitude',type:'number',step:'any'}
 ];
 const restaurantBranchFields=[
-  {name:'restaurant_id',label:'Restaurant',as:'select',options:[]},
   {name:'name',label:'Branch name',placeholder:'e.g. Adajan Branch'},
   {name:'address',label:'Address',as:'textarea',placeholder:'e.g. Adajan, Surat'},
   {name:'city',label:'City',placeholder:'e.g. Surat'},
@@ -36,7 +35,6 @@ const restaurantBranchFields=[
 ];
 const branchListFields=[
   {name:'branch_id',label:'Branch ID'},
-  {name:'restaurant_id',label:'Restaurant ID'},
   {name:'restaurant_name',label:'Restaurant'},
   {name:'name',label:'Branch name'},
   {name:'address',label:'Address'},
@@ -52,7 +50,6 @@ const branchListFields=[
 ];
 const managerListFields=[
   {name:'manager_id',label:'Manager ID'},
-  {name:'restaurant_name',label:'Restaurant'},
   {name:'branch_name',label:'Branch'},
   {name:'name',label:'Manager name'},
   {name:'email',label:'Email'},
@@ -84,7 +81,6 @@ const customerListFields=[
 ];
 const tableListFields=[
   {name:'table_id',label:'Table ID'},
-  {name:'branch_name',label:'Branch'},
   {name:'table_number',label:'Table number'},
   {name:'capacity',label:'Capacity'},
   {name:'status',label:'Status'},
@@ -158,6 +154,7 @@ const normalizeTable=row=>({
 export default function RegistryPage({ kind, readOnly=false, title, description }) {
   const config=registryConfigs[kind]; const toast=useToast(); const {user}=useAuth();
   const branchScope=user.role===ROLES.RESTAURANT?'restaurant':'admin';
+  const loggedInRestaurantId=String(user.restaurant_id||user.restaurant?.restaurant_id||user.user_id||'');
   const [rows,setRows]=useState([]); const [loading,setLoading]=useState(true); const [mode,setMode]=useState(null); const [active,setActive]=useState(null); const [saving,setSaving]=useState(false); const [formError,setFormError]=useState(''); const [restaurantTotal,setRestaurantTotal]=useState(0); const [branchTotal,setBranchTotal]=useState(0); const [managerTotal,setManagerTotal]=useState(0); const [customerTotal,setCustomerTotal]=useState(0); const [tableTotal,setTableTotal]=useState(0); const [restaurantOptions,setRestaurantOptions]=useState([]); const [branchOptions,setBranchOptions]=useState([]); const [managerBranchId,setManagerBranchId]=useState(''); const [tableBranchId,setTableBranchId]=useState('');
   const load=async(params={page:1,limit:10,search:''},selectedManagerBranchId=managerBranchId,selectedTableBranchId=tableBranchId)=>{
     setLoading(true);
@@ -167,7 +164,8 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
         setRows(restaurants.map(normalizeRestaurant));setRestaurantTotal(Number(pagination.total??pagination.totalRecords??pagination.totalItems??data?.total??response?.total??restaurants.length));
       }else if(kind==='branches'){
         const response=await branchApi.list({...params,scope:branchScope});const data=response?.data??response;const branches=Array.isArray(data)?data:data?.branches||data?.items||data?.rows||data?.records||data?.data||[];const pagination=data?.pagination||data?.meta||response?.pagination||response?.meta||{};
-        setRows(branches.map(normalizeBranch));setBranchTotal(Number(pagination.total??pagination.totalRecords??pagination.totalItems??data?.total??response?.total??branches.length));
+        const sessionRestaurantName=user.restaurant_name||user.restaurant?.name||user.name||'';
+        setRows(branches.map(row=>normalizeBranch(branchScope==='restaurant'&&!row.restaurant_name&&!row.restaurant?{...row,restaurant_name:sessionRestaurantName}:row)));setBranchTotal(Number(pagination.total??pagination.totalRecords??pagination.totalItems??data?.total??response?.total??branches.length));
       }else if(kind==='managers'){
         if(branchScope==='restaurant'&&!selectedManagerBranchId){setRows([]);setManagerTotal(0);return}
         const response=await managerApi.list({...params,scope:branchScope,branchId:selectedManagerBranchId});const data=response?.data??response;const managers=Array.isArray(data)?data:data?.managers||data?.items||data?.rows||data?.records||data?.data||[];const pagination=data?.pagination||data?.meta||response?.pagination||response?.meta||{};
@@ -184,7 +182,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   };
   useEffect(()=>{if(['managers','tables'].includes(kind)&&branchScope==='restaurant')return;load()},[kind,branchScope]);
   useEffect(()=>{
-    if(kind!=='branches')return;
+    if(kind!=='branches'||branchScope!=='admin')return;
     let current=true;
     const loadRestaurantOptions=async()=>{
       try{
@@ -220,6 +218,14 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
     return()=>{current=false};
   },[kind,branchScope]);
   useEffect(()=>{setFormError('')},[mode]);
+  useEffect(()=>{
+    if(kind!=='branches'||!restaurantOptions.length)return;
+    setRows(current=>current.map(row=>{
+      if(row.restaurant_name)return row;
+      const option=restaurantOptions.find(item=>String(item.value)===String(row.restaurant_id));
+      return option?{...row,restaurant_name:option.label.replace(/ \(ID:.*\)$/,'')}:row;
+    }));
+  },[kind,restaurantOptions]);
   const save=async values=>{
     setSaving(true); setFormError('');
     try {
@@ -236,12 +242,14 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
         setRows(current=>current.map(row=>(row.restaurant_id||row.id)===restaurantId?updated:row)); toast('Restaurant updated'); setMode(null); return;
       }
       if(kind==='branches'&&mode==='add'){
-        const response=await branchApi.create(values,branchScope);const branch=response?.data?.branch??response?.data??response;const created=normalizeBranch({...values,...branch});
+        const branchValues=branchScope==='restaurant'?{...values,restaurant_id:loggedInRestaurantId}:values;
+        const response=await branchApi.create(branchValues,branchScope);const branch=response?.data?.branch??response?.data??response;const selectedRestaurant=restaurantOptions.find(option=>String(option.value)===String(branchValues.restaurant_id));const restaurantName=branch?.restaurant?.name||branch?.restaurant_name||selectedRestaurant?.label?.replace(/ \(ID:.*\)$/,'')||user.restaurant_name||user.restaurant?.name||user.name||'';const created=normalizeBranch({...branchValues,...branch,restaurant_name:restaurantName});
         setRows(current=>[created,...current]);setBranchTotal(total=>total+1);toast('Branch created');setMode(null);return;
       }
       if(kind==='branches'&&mode==='edit'){
         const branchId=active.branch_id||active.id;if(!branchId)throw new Error('Branch ID is missing.');
-        const response=await branchApi.update(branchId,values,branchScope);const branch=response?.data?.branch??response?.data??response;const updated=normalizeBranch({...active,...values,...branch});
+        const branchValues=branchScope==='restaurant'?{...values,restaurant_id:loggedInRestaurantId}:values;
+        const response=await branchApi.update(branchId,branchValues,branchScope);const branch=response?.data?.branch??response?.data??response;const updated=normalizeBranch({...active,...branchValues,...branch});
         setRows(current=>current.map(row=>(row.branch_id||row.id)===branchId?updated:row));toast('Branch updated');setMode(null);return;
       }
       if(kind==='managers'&&mode==='add'&&branchScope==='restaurant'){
@@ -270,7 +278,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
     {name:'status',label:'Status',as:'select',options:activeOptions}
   ],[config]);
   const branchCreateFields=useMemo(()=>config.fields.map(field=>field.name==='restaurant_id'?{...field,label:'Restaurant',as:'select',type:undefined,options:[{value:'',label:'Select restaurant'},...restaurantOptions]}:field),[config,restaurantOptions]);
-  const restaurantBranchCreateFields=useMemo(()=>restaurantBranchFields.map(field=>field.name==='restaurant_id'?{...field,options:[{value:'',label:'Select restaurant'},...restaurantOptions]}:field),[restaurantOptions]);
+  const restaurantBranchCreateFields=restaurantBranchFields;
   const restaurantBranchEditFields=useMemo(()=>[
     ...restaurantBranchCreateFields,
     {name:'queue_enabled',label:'Queue enabled',as:'select',options:[{value:'true',label:'Enabled'},{value:'false',label:'Disabled'}]}
@@ -280,7 +288,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const formFields=kind==='restaurants'&&mode==='edit'?restaurantEditFields:kind==='branches'&&branchScope==='restaurant'&&mode==='edit'?restaurantBranchEditFields:kind==='branches'&&branchScope==='restaurant'?restaurantBranchCreateFields:kind==='branches'&&mode==='edit'?branchUpdateFields:kind==='branches'?branchCreateFields:kind==='managers'&&branchScope==='restaurant'?managerCreateFormFields:kind==='customers'?customerUpdateFields:kind==='tables'?tableCreateFields:config.fields;
   const formInitial=mode==='edit'?active:null;
   const detailFields=kind==='restaurants'?config.fields.filter(field=>field.name!=='password'):kind==='branches'?branchListFields.filter(field=>!['created_at','updated_at'].includes(field.name)):config.fields;
-  const displayFields=useMemo(()=>{if(kind==='branches')return branchListFields;if(kind==='managers')return managerListFields;if(kind==='customers')return customerListFields;if(kind==='tables')return tableListFields;const fields=config.fields.filter(field=>!['address','device_token','created_at','password'].includes(field.name));return kind==='restaurants'?[...fields,{name:'status',label:'Status'}]:fields},[config,kind]);
+  const displayFields=useMemo(()=>{if(kind==='branches')return branchScope==='admin'?branchListFields.filter(field=>field.name!=='address'):branchListFields;if(kind==='managers')return managerListFields;if(kind==='customers')return customerListFields;if(kind==='tables')return tableListFields;const fields=config.fields.filter(field=>!['address','device_token','created_at','password'].includes(field.name));return kind==='restaurants'?[...fields,{name:'status',label:'Status'}]:fields},[config,kind,branchScope]);
   const dataColumns=displayFields.map(field=>({key:field.name,label:field.label,render:value=>renderRegistryValue(field,value)}));
   const actionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="View" onClick={()=>{setActive(row);setMode('view')}}><Eye/></button>{!readOnly&&<button title="Edit" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button>}</div>};
   const customerActionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="Update status" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button></div>};

@@ -1,6 +1,22 @@
 import { storage } from "../../services/storageService";
 import { STORAGE_KEYS, ROLES } from "../../utils/constants";
 import { authApi } from "../../api/authApi";
+
+const legacyDataKeys = [
+  'restrodesk_accounts',
+  'restrodesk_managers',
+  'restrodesk_settings',
+  'restrodesk_restaurants',
+  'restrodesk_branches',
+  'restrodesk_customers',
+  'restrodesk_tables',
+  'restrodesk_tokens',
+  'restrodesk_queue',
+  'restrodesk_profiles',
+];
+
+const clearLegacyData = () => legacyDataKeys.forEach(key => storage.remove(key));
+
 export const authService = {
   async login(email, password, role = ROLES.SUPER_ADMIN) {
     const loginRequests = {
@@ -26,11 +42,13 @@ export const authService = {
       image: apiUser.image || apiUser.profile_image || "",
     };
 
+    clearLegacyData();
     storage.set(STORAGE_KEYS.authToken, token);
     storage.set(STORAGE_KEYS.session, account);
     return account;
   },
   current() {
+    clearLegacyData();
     return storage.get(STORAGE_KEYS.session);
   },
   async logout() {
@@ -51,12 +69,5 @@ export const authService = {
   },
   async registerCustomer(data) {
     return authApi.customerRegister(data);
-  },
-  saveProfile(role, profile) {
-    const profiles = storage.get(STORAGE_KEYS.profiles, {});
-    profiles[role] = profile;
-    storage.set(STORAGE_KEYS.profiles, profiles);
-    storage.set(STORAGE_KEYS.session, profile);
-    return profile;
   },
 };
