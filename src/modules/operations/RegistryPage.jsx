@@ -87,7 +87,6 @@ const tableListFields=[
   {name:'updated_at',label:'Updated at'}
 ];
 const restaurantListFields=[
-  {name:'name',label:'Name'},
   {name:'email',label:'Email'},
   {name:'phone',label:'Phone'},
   {name:'restaurant_name',label:'Restaurant name'},
@@ -111,7 +110,7 @@ export const registryConfigs = {
     {name:'branch_id',label:'Branch',as:'select',options:[]},{name:'table_number',label:'Table number',placeholder:'e.g. T9'},{name:'capacity',label:'Capacity',type:'number',min:1},{name:'status',label:'Status',as:'select',options:['AVAILABLE','OCCUPIED','DISABLED']}
   ]},
   restaurants:{singular:'Restaurant',title:'Restaurants',description:'Create, update and activate restaurant accounts.',fields:[
-    {name:'name',label:'Name',placeholder:'e.g. Restaurant Owner'},{name:'email',label:'Email',type:'email'},{name:'phone',label:'Phone'},{name:'password',label:'Password',type:'password',minLength:8,placeholder:'Minimum 8 characters'},{name:'restaurant_name',label:'Restaurant name',placeholder:'e.g. Spice Hub'},{name:'restaurant_description',label:'Restaurant description',as:'textarea'},{name:'restaurant_phone',label:'Restaurant phone'},{name:'restaurant_address',label:'Restaurant address',as:'textarea'},{name:'logo',label:'Logo',type:'file',accept:'image/*',required:false}
+    {name:'email',label:'Email',type:'email'},{name:'phone',label:'Phone'},{name:'password',label:'Password',type:'password',minLength:8,placeholder:'Minimum 8 characters'},{name:'restaurant_name',label:'Restaurant name',placeholder:'e.g. Spice Hub'},{name:'restaurant_description',label:'Restaurant description',as:'textarea'},{name:'restaurant_phone',label:'Restaurant phone'},{name:'restaurant_address',label:'Restaurant address',as:'textarea'},{name:'logo',label:'Logo',type:'file',accept:'image/*',required:false}
   ]}
 };
 
