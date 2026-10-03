@@ -9,6 +9,8 @@ import RegistryPage from '../modules/operations/RegistryPage';
 import CustomerQueue from '../modules/customer/CustomerQueue';
 import ProtectedRoute from './ProtectedRoute';
 
+import MyProfile from '../modules/profile/MyProfile';
+
 const access = roles => <ProtectedRoute roles={roles}/>;
 export default function AppRoutes(){
   const {user}=useAuth();
@@ -16,6 +18,7 @@ export default function AppRoutes(){
     <Route path="/login" element={user?<Navigate to="/dashboard" replace/>:<Login/>}/>
     <Route element={<ProtectedRoute/>}><Route element={<DashboardLayout/>}>
       <Route path="/dashboard" element={<Dashboard/>}/>
+      <Route element={access([ROLES.RESTAURANT])}><Route path="/my-profile" element={<MyProfile/>}/></Route>
       <Route element={access([ROLES.SUPER_ADMIN])}><Route path="/restaurants" element={<RegistryPage kind="restaurants"/>}/></Route>
       <Route element={access([ROLES.SUPER_ADMIN,ROLES.RESTAURANT])}><Route path="/branches" element={<RegistryPage kind="branches"/>}/><Route path="/managers" element={<RegistryPage kind="managers"/>}/></Route>
       <Route element={access([ROLES.SUPER_ADMIN,ROLES.MANAGER])}><Route path="/customers" element={<RegistryPage kind="customers"/>}/><Route path="/queue" element={<Queue/>}/><Route path="/history" element={<Queue/>}/></Route>

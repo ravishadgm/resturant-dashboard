@@ -1214,3 +1214,4 @@ Admin Role
 - Restaurant: restaurant@restrodesk.com / Restaurant@123
 - Manager: manager@restrodesk.com / Manager@123
 - Customer: customer@restrodesk.com / Customer@123
+=========================================================================================

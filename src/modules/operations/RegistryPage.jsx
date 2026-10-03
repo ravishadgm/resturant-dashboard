@@ -34,19 +34,34 @@ const restaurantBranchFields=[
   {name:'phone',label:'Phone number'}
 ];
 const branchListFields=[
-  {name:'branch_id',label:'Branch ID'},
-  {name:'restaurant_name',label:'Restaurant'},
   {name:'name',label:'Branch name'},
-  {name:'address',label:'Address'},
+  {name:'branch_id',label:'Branch ID'},
+  {name:'address',label:'Branch address'},
   {name:'city',label:'City'},
   {name:'latitude',label:'Latitude'},
   {name:'longitude',label:'Longitude'},
-  {name:'phone',label:'Phone'},
-  {name:'email',label:'Email'},
-  {name:'status',label:'Status'},
+  {name:'status',label:'Branch status'},
   {name:'queue_enabled',label:'Queue'},
+  {name:'avg_dining_minutes',label:'Average dining (minutes)'},
+  {name:'slot_interval_minutes',label:'Slot interval (minutes)'},
+  {name:'slot_capacity',label:'Slot capacity'},
+  {name:'notify_lead_minutes',label:'Notify lead (minutes)'},
+  {name:'rating',label:'Rating'},
+  {name:'map_url',label:'Map URL'},
   {name:'created_at',label:'Created at'},
-  {name:'updated_at',label:'Updated at'}
+  {name:'updated_at',label:'Updated at'},
+  {name:'restaurant_name',label:'Restaurant'},
+  {name:'restaurant_phone',label:'Restaurant phone'},
+  {name:'restaurant_email',label:'Restaurant email'}
+];
+const branchDetailFields=[
+  ...branchListFields.filter(field=>!['created_at','updated_at'].includes(field.name)&&!field.name.startsWith('restaurant_')),
+  {name:'phone',label:'Branch phone'},
+  {name:'email',label:'Branch email'},
+  ...branchListFields.filter(field=>field.name.startsWith('restaurant_')),
+  {name:'restaurant_address',label:'Restaurant address'},
+  {name:'restaurant_description',label:'Restaurant description'},
+  {name:'logo',label:'Restaurant logo'}
 ];
 const managerListFields=[
   {name:'manager_id',label:'Manager ID'},
@@ -86,6 +101,26 @@ const tableListFields=[
   {name:'created_at',label:'Created at'},
   {name:'updated_at',label:'Updated at'}
 ];
+const tableBranchFields=[
+  {name:'branch_id',label:'Branch ID'},
+  {name:'branch_name',label:'Branch name',source:'name'},
+  {name:'branch_restaurant_id',label:'Restaurant ID',source:'restaurant_id'},
+  {name:'branch_address',label:'Branch address',source:'address'},
+  {name:'branch_city',label:'Branch city',source:'city'},
+  {name:'branch_latitude',label:'Branch latitude',source:'latitude'},
+  {name:'branch_longitude',label:'Branch longitude',source:'longitude'},
+  {name:'branch_map_url',label:'Branch map URL',source:'map_url'},
+  {name:'branch_rating',label:'Branch rating',source:'rating'},
+  {name:'branch_status',label:'Branch status',source:'status'},
+  {name:'branch_queue_enabled',label:'Branch queue',source:'queue_enabled'},
+  {name:'branch_avg_dining_minutes',label:'Average dining (minutes)',source:'avg_dining_minutes'},
+  {name:'branch_notify_lead_minutes',label:'Notify lead (minutes)',source:'notify_lead_minutes'},
+  {name:'branch_slot_capacity',label:'Slot capacity',source:'slot_capacity'},
+  {name:'branch_slot_interval_minutes',label:'Slot interval (minutes)',source:'slot_interval_minutes'},
+  {name:'branch_created_at',label:'Branch created at',source:'created_at'},
+  {name:'branch_updated_at',label:'Branch updated at',source:'updated_at'}
+];
+const adminTableListFields=[...tableListFields.slice(0,2),...tableBranchFields,...tableListFields.slice(2)];
 const restaurantListFields=[
   {name:'email',label:'Email'},
   {name:'phone',label:'Phone'},
@@ -117,9 +152,9 @@ export const registryConfigs = {
 const pretty=value=>value===undefined||value===null||value===''?'—':String(value);
 const mediaUrl=value=>!value?'':/^https?:\/\//i.test(value)?value:`${API_BASE_URL}${value.startsWith('/')?'':'/'}${value}`;
 const renderRegistryValue=(field,value)=>{
-  if(field.name==='status')return <span className={`registry-status ${String(value).toLowerCase()}`}>{pretty(value)}</span>;
-  if(field.name==='queue_enabled')return <span className={`registry-status ${value?'active':'inactive'}`}>{value?'Enabled':'Disabled'}</span>;
-  if(['created_at','updated_at'].includes(field.name))return value?new Date(value).toLocaleString():'—';
+  if(field.name==='status'||field.source==='status')return <span className={`registry-status ${String(value).toLowerCase()}`}>{pretty(value)}</span>;
+  if(field.name==='queue_enabled'||field.source==='queue_enabled')return value==null?pretty(value): <span className={`registry-status ${value?'active':'inactive'}`}>{value?'Enabled':'Disabled'}</span>;
+  if(['created_at','updated_at'].includes(field.source||field.name))return value?new Date(value).toLocaleString():'—';
   if(field.name==='logo')return value?<img className="restaurant-logo-thumb" src={mediaUrl(value)} alt="Restaurant logo"/>:pretty(value);
   return pretty(value);
 };
@@ -129,7 +164,19 @@ const normalizeRestaurant=row=>{
   const owner=row.owner||row.user||{}; const {password,...safeRow}=row;
   return {...safeRow,owner:withoutPassword(row.owner),user:withoutPassword(row.user),id:row.id||row.restaurant_id||crypto.randomUUID(),name:owner.name||row.owner_name||'',email:owner.email||row.owner_email||row.email||'',phone:owner.phone||row.owner_phone||row.phone||'',restaurant_name:row.restaurant_name||row.restaurant?.name||row.name||'',description:row.description||row.restaurant_description||'',restaurant_description:row.description||row.restaurant_description||'',restaurant_phone:row.restaurant_phone||row.restaurant?.phone||row.phone||'',restaurant_address:row.restaurant_address||row.address||'',logo:row.logo||row.image||'',createdAt:row.createdAt||row.created_at,updatedAt:row.updatedAt||row.updated_at};
 };
-const normalizeBranch=row=>({...row,id:row.id||row.branch_id||crypto.randomUUID(),restaurant_name:row.restaurant_name||row.restaurant?.name||'',createdAt:row.createdAt||row.created_at,updatedAt:row.updatedAt||row.updated_at});
+const normalizeBranch=row=>({
+  ...row,
+  restaurant:withoutPassword(row.restaurant),
+  id:row.id||row.branch_id||crypto.randomUUID(),
+  restaurant_name:row.restaurant_name||row.restaurant?.name||'',
+  restaurant_phone:row.restaurant?.phone??row.restaurant_phone??'',
+  restaurant_email:row.restaurant?.email??row.restaurant_email??'',
+  restaurant_address:row.restaurant?.address??row.restaurant_address??'',
+  restaurant_description:row.restaurant?.description??row.restaurant_description??'',
+  logo:row.restaurant?.logo??row.logo??'',
+  createdAt:row.createdAt||row.created_at,
+  updatedAt:row.updatedAt||row.updated_at
+});
 const normalizeManager=row=>({
   ...row,
   user:withoutPassword(row.user),
@@ -155,7 +202,7 @@ const normalizeCustomer=row=>({
 const normalizeTable=row=>({
   ...row,
   id:row.id||row.table_id||crypto.randomUUID(),
-  branch_name:row.branch?.name||row.branch_name||'',
+  ...Object.fromEntries(tableBranchFields.map(field=>[field.name,row[field.name]??row.branch?.[field.source||field.name]??null])),
   createdAt:row.createdAt||row.created_at,
   updatedAt:row.updatedAt||row.updated_at
 });
@@ -302,8 +349,8 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const managerCreateFormFields=useMemo(()=>managerCreateFields.map(field=>field.name==='branch_id'?{...field,options:[{value:'',label:'Select branch'},...branchOptions]}:field),[branchOptions]);
   const formFields=kind==='restaurants'&&mode==='edit'?restaurantEditFields:kind==='branches'&&branchScope==='restaurant'&&mode==='edit'?restaurantBranchEditFields:kind==='branches'&&branchScope==='restaurant'?restaurantBranchCreateFields:kind==='branches'&&mode==='edit'?branchUpdateFields:kind==='branches'?branchCreateFields:kind==='managers'&&branchScope==='restaurant'?managerCreateFormFields:kind==='customers'?customerUpdateFields:kind==='tables'?tableCreateFields:config.fields;
   const formInitial=mode==='edit'?active:null;
-  const detailFields=kind==='restaurants'?config.fields.filter(field=>field.name!=='password'):kind==='branches'?branchListFields.filter(field=>!['created_at','updated_at'].includes(field.name)):config.fields;
-  const displayFields=useMemo(()=>{if(kind==='restaurants')return restaurantListFields;if(kind==='branches')return branchScope==='admin'?branchListFields.filter(field=>field.name!=='address'):branchListFields;if(kind==='managers')return managerListFields;if(kind==='customers')return customerListFields;if(kind==='tables')return tableListFields;return config.fields.filter(field=>!['address','device_token','created_at','password'].includes(field.name))},[config,kind,branchScope]);
+  const detailFields=kind==='restaurants'?config.fields.filter(field=>field.name!=='password'):kind==='branches'?branchDetailFields:config.fields;
+  const displayFields=useMemo(()=>{if(kind==='restaurants')return restaurantListFields;if(kind==='branches')return branchListFields;if(kind==='managers')return managerListFields;if(kind==='customers')return customerListFields;if(kind==='tables')return user.role===ROLES.SUPER_ADMIN?adminTableListFields:tableListFields;return config.fields.filter(field=>!['address','device_token','created_at','password'].includes(field.name))},[config,kind,branchScope,user.role]);
   const dataColumns=displayFields.map(field=>({key:field.name,label:field.label,render:value=>renderRegistryValue(field,value)}));
   const actionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="View" onClick={()=>{setActive(row);setMode('view')}}><Eye/></button>{!readOnly&&<button title="Edit" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button>}</div>};
   const customerActionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="Update status" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button></div>};
@@ -314,7 +361,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const managerBranchFilter=kind==='managers'&&branchScope==='restaurant'?<div className="table-card queue-branch-filter"><label className="field"><span>Branch</span><select value={managerBranchId} onChange={changeManagerBranch} disabled={loading}>{branchOptions.length?branchOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>):<option value="">No branches available</option>}</select></label></div>:null;
   const changeTableBranch=event=>{const nextBranch=event.target.value;setTableBranchId(nextBranch);load({page:1,limit:10,search:''},managerBranchId,nextBranch)};
   const tableBranchFilter=kind==='tables'&&branchScope==='restaurant'?<div className="table-card queue-branch-filter"><label className="field"><span>Branch</span><select value={tableBranchId} onChange={changeTableBranch} disabled={loading}>{branchOptions.length?branchOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>):<option value="">No branches available</option>}</select></label></div>:null;
-  return <><PageHeader eyebrow="OPERATIONS" title={title||config.title} description={description||config.description} action={canAdd&&<button className="btn primary" onClick={()=>{setActive(null);setMode('add')}}><Plus size={17}/> Add {config.singular}</button>}/>{managerBranchFilter}{tableBranchFilter}{kind==='restaurants'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={restaurantTotal} onQueryChange={load} searchPlaceholder="Search restaurants"/>:kind==='branches'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={branchTotal} onQueryChange={load} searchPlaceholder="Search branches" minWidth={2100}/>:kind==='managers'?<ServerTable key={branchScope==='restaurant'?managerBranchId:'admin-managers'} columns={columns} data={visibleRows} loading={loading} total={managerTotal} onQueryChange={params=>load(params,managerBranchId)} searchPlaceholder="Search managers" minWidth={1500}/>:kind==='customers'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={customerTotal} onQueryChange={load} searchPlaceholder="Search customers" minWidth={1200}/>:kind==='tables'?<ServerTable key={branchScope==='restaurant'?tableBranchId:'admin-tables'} columns={columns} data={visibleRows} loading={loading} total={tableTotal} onQueryChange={params=>load(params,managerBranchId,tableBranchId)} searchPlaceholder="Search tables" minWidth={900}/>:<CommonTable columns={columns} data={visibleRows} loading={loading} searchPlaceholder={`Search ${config.title.toLowerCase()}…`}/>}
+  return <><PageHeader eyebrow="OPERATIONS" title={title||config.title} description={description||config.description} action={canAdd&&<button className="btn primary" onClick={()=>{setActive(null);setMode('add')}}><Plus size={17}/> Add {config.singular}</button>}/>{managerBranchFilter}{tableBranchFilter}{kind==='restaurants'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={restaurantTotal} onQueryChange={load} searchPlaceholder="Search restaurants"/>:kind==='branches'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={branchTotal} onQueryChange={load} searchPlaceholder="Search branches" minWidth={3000}/>:kind==='managers'?<ServerTable key={branchScope==='restaurant'?managerBranchId:'admin-managers'} columns={columns} data={visibleRows} loading={loading} total={managerTotal} onQueryChange={params=>load(params,managerBranchId)} searchPlaceholder="Search managers" minWidth={1500}/>:kind==='customers'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={customerTotal} onQueryChange={load} searchPlaceholder="Search customers" minWidth={1200}/>:kind==='tables'?<ServerTable key={branchScope==='restaurant'?tableBranchId:'admin-tables'} columns={columns} data={visibleRows} loading={loading} total={tableTotal} onQueryChange={params=>load(params,managerBranchId,tableBranchId)} searchPlaceholder="Search tables" minWidth={user.role===ROLES.SUPER_ADMIN?3600:900}/>:<CommonTable columns={columns} data={visibleRows} loading={loading} searchPlaceholder={`Search ${config.title.toLowerCase()}…`}/>}
     <Modal open={mode==='add'||mode==='edit'} title={`${mode==='edit'?'Edit':'Add'} ${config.singular}`} onClose={()=>{if(!saving)setMode(null)}} size="wide"><EntityForm initial={formInitial} fields={formFields} onCancel={()=>setMode(null)} onSubmit={save} onFormChange={()=>setFormError('')} submitLabel={mode==='edit'?'Save changes':`Add ${config.singular}`} busy={saving} formError={formError}/></Modal>
     <Modal open={mode==='view'} title={`${config.singular} details`} onClose={()=>setMode(null)} size="wide"><div className="registry-detail">{detailFields.map(field=><div key={field.name}><span>{field.label}</span><strong>{renderRegistryValue(field,active?.[field.name])}</strong></div>)}<div><span>Created at</span><strong>{active?.createdAt?new Date(active.createdAt).toLocaleString():'—'}</strong></div><div><span>Updated at</span><strong>{active?.updatedAt?new Date(active.updatedAt).toLocaleString():'—'}</strong></div></div><footer className="modal-actions"><button className="btn secondary" onClick={()=>setMode(null)}>Close</button>{!readOnly&&<button className="btn primary" onClick={()=>setMode('edit')}><Pencil size={16}/> Edit</button>}</footer></Modal>
   </>;

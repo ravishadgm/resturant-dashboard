@@ -53,6 +53,7 @@ export default function DashboardLayout() {
       [History, "Complete history", "/history"],
     ],
     [ROLES.RESTAURANT]: [
+      [UserRound, "My Profile", "/my-profile"],
       [LayoutDashboard, "Overview", "/dashboard"],
       [Building2, "Branches", "/branches"],
       [Users, "Managers", "/managers"],
@@ -171,6 +172,7 @@ export default function DashboardLayout() {
               </button>
               {menu && (
                 <div className="profile-dropdown">
+                  {user.role === ROLES.RESTAURANT && <button onClick={() => { setMenu(false); nav('/my-profile'); }}><UserRound size={17} /> My Profile</button>}
                   <button onClick={signOut} className="danger">
                     <LogOut size={17} /> Sign out
                   </button>
