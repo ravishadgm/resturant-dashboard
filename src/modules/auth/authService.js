@@ -2,6 +2,8 @@ import { storage } from "../../services/storageService";
 import { STORAGE_KEYS, ROLES } from "../../utils/constants";
 import { authApi } from "../../api/authApi";
 
+import { PORTAL_ROLE } from '../../utils/portal';
+
 const legacyDataKeys = [
   'restrodesk_accounts',
   'restrodesk_managers',
@@ -18,7 +20,8 @@ const legacyDataKeys = [
 const clearLegacyData = () => legacyDataKeys.forEach(key => storage.remove(key));
 
 export const authService = {
-  async login(email, password, role = ROLES.SUPER_ADMIN) {
+  async login(email, password, role = PORTAL_ROLE) {
+    if (role !== PORTAL_ROLE) throw new Error('This account type is not supported by this portal.');
     const loginRequests = {
       [ROLES.SUPER_ADMIN]: authApi.adminLogin,
       [ROLES.RESTAURANT]: authApi.restaurantLogin,
@@ -49,7 +52,13 @@ export const authService = {
   },
   current() {
     clearLegacyData();
-    return storage.get(STORAGE_KEYS.session);
+    const session = storage.get(STORAGE_KEYS.session);
+    if (session && session.role !== PORTAL_ROLE) {
+      storage.remove(STORAGE_KEYS.session);
+      storage.remove(STORAGE_KEYS.authToken);
+      return null;
+    }
+    return session;
   },
   async logout() {
     const user = storage.get(STORAGE_KEYS.session);

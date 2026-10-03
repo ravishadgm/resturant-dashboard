@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { ROLE_LABELS, ROLES } from "../../utils/constants";
+import { PORTAL_LABEL } from "../../utils/portal";
 import Avatar from "../common/Avatar";
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
@@ -95,7 +96,7 @@ export default function DashboardLayout() {
           </span>
           <div>
             <strong>RestroDesk</strong>
-            <small>Restaurant Dashboard</small>
+            <small>{PORTAL_LABEL}</small>
           </div>
           <button
             className="mobile-close"

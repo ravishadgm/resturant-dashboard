@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Building2, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { ROLES } from '../../utils/constants';
+import { PORTAL_ROLE, PORTAL_LABEL } from '../../utils/portal';
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [show, setShow] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const [accountType, setAccountType] = useState(ROLES.SUPER_ADMIN);
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ export default function Login() {
     }
     setBusy(true);
     try {
-      await login(form.email.trim(), form.password, accountType);
+      await login(form.email.trim(), form.password, PORTAL_ROLE);
       navigate('/dashboard');
     } catch (loginError) {
       setError(loginError.message);
@@ -31,16 +31,15 @@ export default function Login() {
     }
   };
 
-  const useDemo = (email, password, role) => {
+  const useDemo = (email, password) => {
     setForm({ email, password });
-    setAccountType(role);
     setError('');
   };
 
   return (
     <main className="simple-login-page">
       <section className="simple-login-card">
-        <div className="simple-login-brand"><ShieldCheck /><span>Restaurant Dashboard</span></div>
+        <div className="simple-login-brand"><ShieldCheck /><span>{PORTAL_LABEL}</span></div>
         <div className="simple-login-heading">
           <h1>Welcome back</h1>
           <p>Sign in to continue.</p>
@@ -60,8 +59,7 @@ export default function Login() {
         <div className="simple-demo">
           <span>Demo login</span>
           <div className="demo-account-grid">
-            <button type="button" onClick={() => useDemo('admin@godine.local', 'Admin@123', ROLES.SUPER_ADMIN)}><ShieldCheck /> Admin</button>
-            <button type="button" onClick={() => useDemo('rest1@test.com', 'Rest@123', ROLES.RESTAURANT)}><Building2 /> Restaurant</button>
+            {PORTAL_ROLE === 'super-admin' ? <button type="button" onClick={() => useDemo('admin@godine.local', 'Admin@123')}><ShieldCheck /> Admin</button> : <button type="button" onClick={() => useDemo('rest1@test.com', 'Rest@123')}><Building2 /> Restaurant</button>}
           </div>
         </div>
       </section>
