@@ -175,7 +175,6 @@ export default function Queue() {
         </select>
       </label>
     </div>
-    
     <ServerTable
       key={`${historyPage ? 'history' : 'queue'}-${branchId}`}
       columns={columns}
