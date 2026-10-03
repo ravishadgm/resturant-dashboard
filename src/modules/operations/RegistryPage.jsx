@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Eye, Pencil, Plus } from 'lucide-react';
+import MapLink from '../../components/common/MapLink';
 import CommonTable from '../../components/common/CommonTable';
 import ServerTable from '../../components/common/ServerTable';
 import EntityForm from '../../components/common/EntityForm';
@@ -152,6 +153,7 @@ export const registryConfigs = {
 const pretty=value=>value===undefined||value===null||value===''?'—':String(value);
 const mediaUrl=value=>!value?'':/^https?:\/\//i.test(value)?value:`${API_BASE_URL}${value.startsWith('/')?'':'/'}${value}`;
 const renderRegistryValue=(field,value)=>{
+  if(field.name==='map_url'||field.source==='map_url')return <MapLink value={value}/>;
   if(field.name==='status'||field.source==='status')return <span className={`registry-status ${String(value).toLowerCase()}`}>{pretty(value)}</span>;
   if(field.name==='queue_enabled'||field.source==='queue_enabled')return value==null?pretty(value): <span className={`registry-status ${value?'active':'inactive'}`}>{value?'Enabled':'Disabled'}</span>;
   if(['created_at','updated_at'].includes(field.source||field.name))return value?new Date(value).toLocaleString():'—';
