@@ -18,13 +18,20 @@ import { useAuth } from '../../context/AuthContext';
 import { ROLES } from '../../utils/constants';
 
 const activeOptions=['ACTIVE','INACTIVE'];
-const branchUpdateFields=[
+const adminBranchFields=[
+  {name:'restaurant_id',label:'Restaurant ID',type:'number',min:1},
   {name:'name',label:'Branch name'},
+  {name:'address',label:'Address',as:'textarea'},
   {name:'city',label:'City'},
-  {name:'email',label:'Email address',type:'email'},
-  {name:'phone',label:'Phone number'},
   {name:'latitude',label:'Latitude',type:'number',step:'any'},
-  {name:'longitude',label:'Longitude',type:'number',step:'any'}
+  {name:'longitude',label:'Longitude',type:'number',step:'any'},
+  {name:'slot_interval_minutes',label:'Slot interval (minutes)',type:'number',min:1},
+  {name:'slot_capacity',label:'Slot capacity',type:'number',min:1},
+  {name:'advance_booking_days',label:'Advance booking (days)',type:'number',min:0},
+  {name:'notify_lead_minutes',label:'Notify lead (minutes)',type:'number',min:0},
+  {name:'queue_enabled',label:'Queue enabled',as:'select',options:[{value:'',label:'Select queue status'},{value:'true',label:'Enabled'},{value:'false',label:'Disabled'}]},
+  {name:'rating',label:'Rating',type:'number',min:0,max:5,step:'0.1'},
+  {name:'map_url',label:'Map URL',type:'url'}
 ];
 const restaurantBranchFields=[
   {name:'name',label:'Branch name',placeholder:'e.g. Adajan Branch'},
@@ -49,27 +56,29 @@ const branchListFields=[
   {name:'notify_lead_minutes',label:'Notify lead (minutes)'},
   {name:'rating',label:'Rating'},
   {name:'map_url',label:'Map URL'},
-  {name:'created_at',label:'Created at'},
-  {name:'updated_at',label:'Updated at'},
   {name:'restaurant_name',label:'Restaurant'},
   {name:'restaurant_phone',label:'Restaurant phone'},
-  {name:'restaurant_email',label:'Restaurant email'}
-];
-const branchDetailFields=[
-  ...branchListFields.filter(field=>!['created_at','updated_at'].includes(field.name)&&!field.name.startsWith('restaurant_')),
-  {name:'phone',label:'Branch phone'},
-  {name:'email',label:'Branch email'},
-  ...branchListFields.filter(field=>field.name.startsWith('restaurant_')),
+  {name:'restaurant_email',label:'Restaurant email'},
+  {name:'restaurant_id',label:'Restaurant ID'},
   {name:'restaurant_address',label:'Restaurant address'},
   {name:'restaurant_description',label:'Restaurant description'},
-  {name:'logo',label:'Restaurant logo'}
+  {name:'restaurant_role',label:'Restaurant role'},
+  {name:'restaurant_status',label:'Restaurant status',source:'status'},
+  {name:'restaurant_latitude',label:'Restaurant latitude'},
+  {name:'restaurant_longitude',label:'Restaurant longitude'},
+  {name:'restaurant_branch_id',label:'Restaurant branch ID'},
+  {name:'logo',label:'Restaurant logo'},
+  {name:'created_at',label:'Created at'},
+  {name:'updated_at',label:'Updated at'}
 ];
 const managerListFields=[
-  {name:'manager_id',label:'Manager ID'},
   {name:'name',label:'Manager name'},
   {name:'email',label:'Email'},
   {name:'phone',label:'Phone'},
-  {name:'status',label:'Status'},
+  {name:'status',label:'Manager status'},
+  {name:'branch_name',label:'Branch'},
+  {name:'city',label:'Branch city'},
+  {name:'restaurant_name',label:'Restaurant'},
   {name:'created_at',label:'Created at'},
   {name:'updated_at',label:'Updated at'}
 ];
@@ -98,7 +107,9 @@ const tableListFields=[
   {name:'table_number',label:'Table number'},
   {name:'table_id',label:'Table ID'},
   {name:'capacity',label:'Capacity'},
-  {name:'status',label:'Status'},
+  {name:'status',label:'Table status'}
+];
+const tableTimestampFields=[
   {name:'created_at',label:'Table created at'},
   {name:'updated_at',label:'Table updated at'}
 ];
@@ -120,11 +131,19 @@ const tableBranchFields=[
   {name:'branch_restaurant_id',label:'Restaurant ID',source:'restaurant_id'}
 ];
 const tableDisplayFields=[
-  {name:'restaurant_name',label:'Restaurant name'},
+  ...tableListFields,
   {name:'branch_name',label:'Branch name'},
-  ...tableListFields
+  {name:'branch_city',label:'Branch city'},
+  {name:'restaurant_name',label:'Restaurant name'},
+  ...tableTimestampFields
 ];
-const adminTableListFields=[...tableDisplayFields,...tableBranchFields.filter(field=>field.name!=='branch_name')];
+const adminTableListFields=[
+  ...tableListFields,
+  ...tableBranchFields.filter(field=>!['branch_id','branch_restaurant_id','branch_address'].includes(field.name)),
+  {name:'restaurant_name',label:'Restaurant name'},
+  {name:'branch_restaurant_id',label:'Restaurant ID',source:'restaurant_id'},
+  ...tableTimestampFields
+];
 const restaurantListFields=[
   {name:'email',label:'Email'},
   {name:'phone',label:'Phone'},
@@ -136,9 +155,7 @@ const restaurantListFields=[
   {name:'status',label:'Status'}
 ];
 export const registryConfigs = {
-  branches:{singular:'Branch',title:'Branches',description:'Manage restaurant branches, ownership and map locations.',fields:[
-    {name:'restaurant_id',label:'Restaurant ID',type:'number',placeholder:'e.g. 1'},{name:'name',label:'Branch name',placeholder:'e.g. Admin Branch'},{name:'city',label:'City',placeholder:'e.g. Surat'},{name:'email',label:'Email address',type:'email'},{name:'phone',label:'Phone number'},{name:'latitude',label:'Latitude',type:'number',step:'any'},{name:'longitude',label:'Longitude',type:'number',step:'any'}
-  ]},
+  branches:{singular:'Branch',title:'Branches',description:'Manage restaurant branches, ownership and map locations.',fields:adminBranchFields},
   managers:{singular:'Manager',title:'Managers',description:'Assign managers to a specific restaurant branch.',fields:[
     {name:'manager_id',label:'Manager ID',required:false,placeholder:'Generated automatically'},{name:'user_id',label:'User ID',required:false,placeholder:'Generated automatically'},{name:'branch_id',label:'Branch ID',placeholder:'e.g. BR-001'},{name:'name',label:'Full name'},{name:'email',label:'Email address',type:'email'},{name:'phone',label:'Phone number'},{name:'status',label:'Status',as:'select',options:activeOptions}
   ]},
@@ -178,6 +195,10 @@ const normalizeBranch=row=>({
   restaurant_email:row.restaurant?.email??row.restaurant_email??'',
   restaurant_address:row.restaurant?.address??row.restaurant_address??'',
   restaurant_description:row.restaurant?.description??row.restaurant_description??'',
+  ...Object.fromEntries(['role','status','latitude','longitude','branch_id','created_at','updated_at'].map(key=>[`restaurant_${key}`,row.restaurant?.[key]??row[`restaurant_${key}`]??null])),
+  restaurant_id:row.restaurant_id??row.restaurant?.restaurant_id,
+  owner_name:row.owner_name??row.owner?.name??'',
+  owner_phone:row.owner_phone??row.owner?.phone??'',
   logo:row.restaurant?.logo??row.logo??'',
   createdAt:row.createdAt||row.created_at,
   updatedAt:row.updatedAt||row.updated_at
@@ -191,6 +212,8 @@ const normalizeManager=row=>({
   phone:row.user?.phone||row.phone||'',
   restaurant_name:row.restaurant?.name||row.restaurant_name||'',
   branch_name:row.branch?.name||row.branch_name||'',
+  city:row.city||row.branch?.city||'',
+  status:row.status??row.user?.status??'',
   createdAt:row.createdAt||row.created_at,
   updatedAt:row.updatedAt||row.updated_at
 });
@@ -210,6 +233,8 @@ const normalizeTable=row=>({
   ...Object.fromEntries(tableBranchFields.map(field=>[field.name,row[field.name]??row.branch?.[field.source||field.name]??null])),
   restaurant_name:row.restaurant_name??row.branch?.restaurant?.name??row.restaurant?.name??'',
   branch_name:row.branch_name??row.branch?.name??row.name??'',
+  branch_city:row.city??row.branch_city??row.branch?.city??'',
+  branch_restaurant_id:row.restaurant_id??row.branch_restaurant_id??row.branch?.restaurant_id??null,
   createdAt:row.createdAt||row.created_at,
   updatedAt:row.updatedAt||row.updated_at
 });
@@ -354,9 +379,9 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   ],[restaurantBranchCreateFields]);
   const tableCreateFields=useMemo(()=>config.fields.map(field=>field.name==='branch_id'?{...field,options:[{value:'',label:'Select branch'},...branchOptions]}:field),[config,branchOptions]);
   const managerCreateFormFields=useMemo(()=>managerCreateFields.map(field=>field.name==='branch_id'?{...field,options:[{value:'',label:'Select branch'},...branchOptions]}:field),[branchOptions]);
-  const formFields=kind==='restaurants'&&mode==='edit'?restaurantEditFields:kind==='branches'&&branchScope==='restaurant'&&mode==='edit'?restaurantBranchEditFields:kind==='branches'&&branchScope==='restaurant'?restaurantBranchCreateFields:kind==='branches'&&mode==='edit'?branchUpdateFields:kind==='branches'?branchCreateFields:kind==='managers'&&branchScope==='restaurant'?managerCreateFormFields:kind==='customers'?customerUpdateFields:kind==='tables'?tableCreateFields:config.fields;
+  const formFields=kind==='restaurants'&&mode==='edit'?restaurantEditFields:kind==='branches'&&branchScope==='restaurant'&&mode==='edit'?restaurantBranchEditFields:kind==='branches'&&branchScope==='restaurant'?restaurantBranchCreateFields:kind==='branches'?branchCreateFields:kind==='managers'&&branchScope==='restaurant'?managerCreateFormFields:kind==='customers'?customerUpdateFields:kind==='tables'?tableCreateFields:config.fields;
   const formInitial=mode==='edit'?active:null;
-  const detailFields=kind==='restaurants'?config.fields.filter(field=>field.name!=='password'):kind==='branches'?branchDetailFields:config.fields;
+  const detailFields=kind==='restaurants'?config.fields.filter(field=>field.name!=='password'):kind==='branches'?(branchScope==='restaurant'?restaurantBranchCreateFields:branchCreateFields):config.fields;
   const displayFields=useMemo(()=>{if(kind==='restaurants')return restaurantListFields;if(kind==='branches')return branchListFields;if(kind==='managers')return managerListFields;if(kind==='customers')return customerListFields;if(kind==='tables')return user.role===ROLES.SUPER_ADMIN?adminTableListFields:tableDisplayFields;return config.fields.filter(field=>!['address','device_token','created_at','password'].includes(field.name))},[config,kind,branchScope,user.role]);
   const dataColumns=displayFields.map(field=>({key:field.name,label:field.label,render:value=>renderRegistryValue(field,value)}));
   const actionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="View" onClick={()=>{setActive(row);setMode('view')}}><Eye/></button>{!readOnly&&<button title="Edit" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button>}</div>};
@@ -368,8 +393,8 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const managerBranchFilter=kind==='managers'&&branchScope==='restaurant'?<div className="table-card queue-branch-filter"><label className="field"><span>Branch</span><select value={managerBranchId} onChange={changeManagerBranch} disabled={loading}>{branchOptions.length?branchOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>):<option value="">No branches available</option>}</select></label></div>:null;
   const changeTableBranch=event=>{const nextBranch=event.target.value;setTableBranchId(nextBranch);load({page:1,limit:10,search:''},managerBranchId,nextBranch)};
   const tableBranchFilter=kind==='tables'&&branchScope==='restaurant'?<div className="table-card queue-branch-filter"><label className="field"><span>Branch</span><select value={tableBranchId} onChange={changeTableBranch} disabled={loading}>{branchOptions.length?branchOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>):<option value="">No branches available</option>}</select></label></div>:null;
-  return <><PageHeader eyebrow="OPERATIONS" title={title||config.title} description={description||config.description} action={canAdd&&<button className="btn primary" onClick={()=>{setActive(null);setMode('add')}}><Plus size={17}/> Add {config.singular}</button>}/>{managerBranchFilter}{tableBranchFilter}{kind==='restaurants'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={restaurantTotal} onQueryChange={load} searchPlaceholder="Search restaurants"/>:kind==='branches'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={branchTotal} onQueryChange={load} searchPlaceholder="Search branches" minWidth={3000}/>:kind==='managers'?<ServerTable key={branchScope==='restaurant'?managerBranchId:'admin-managers'} columns={columns} data={visibleRows} loading={loading} total={managerTotal} onQueryChange={params=>load(params,managerBranchId)} searchPlaceholder="Search managers" minWidth={1500}/>:kind==='customers'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={customerTotal} onQueryChange={load} searchPlaceholder="Search customers" minWidth={1200}/>:kind==='tables'?<ServerTable key={branchScope==='restaurant'?tableBranchId:'admin-tables'} columns={columns} data={visibleRows} loading={loading} total={tableTotal} onQueryChange={params=>load(params,managerBranchId,tableBranchId)} searchPlaceholder="Search tables" minWidth={user.role===ROLES.SUPER_ADMIN?3600:900}/>:<CommonTable columns={columns} data={visibleRows} loading={loading} searchPlaceholder={`Search ${config.title.toLowerCase()}…`}/>}
+  return <><PageHeader eyebrow="OPERATIONS" title={title||config.title} description={description||config.description} action={canAdd&&<button className="btn primary" onClick={()=>{setActive(null);setMode('add')}}><Plus size={17}/> Add {config.singular}</button>}/>{managerBranchFilter}{tableBranchFilter}{kind==='restaurants'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={restaurantTotal} onQueryChange={load} searchPlaceholder="Search restaurants"/>:kind==='branches'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={branchTotal} onQueryChange={load} searchPlaceholder="Search branches" minWidth={4800}/>:kind==='managers'?<ServerTable key={branchScope==='restaurant'?managerBranchId:'admin-managers'} columns={columns} data={visibleRows} loading={loading} total={managerTotal} onQueryChange={params=>load(params,managerBranchId)} searchPlaceholder="Search managers" minWidth={1500}/>:kind==='customers'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={customerTotal} onQueryChange={load} searchPlaceholder="Search customers" minWidth={1200}/>:kind==='tables'?<ServerTable key={branchScope==='restaurant'?tableBranchId:'admin-tables'} columns={columns} data={visibleRows} loading={loading} total={tableTotal} onQueryChange={params=>load(params,managerBranchId,tableBranchId)} searchPlaceholder="Search tables" minWidth={user.role===ROLES.SUPER_ADMIN?3600:900}/>:<CommonTable columns={columns} data={visibleRows} loading={loading} searchPlaceholder={`Search ${config.title.toLowerCase()}…`}/>}
     <Modal open={mode==='add'||mode==='edit'} title={`${mode==='edit'?'Edit':'Add'} ${config.singular}`} onClose={()=>{if(!saving)setMode(null)}} size="wide"><EntityForm initial={formInitial} fields={formFields} onCancel={()=>setMode(null)} onSubmit={save} onFormChange={()=>setFormError('')} submitLabel={mode==='edit'?'Save changes':`Add ${config.singular}`} busy={saving} formError={formError}/></Modal>
-    <Modal open={mode==='view'} title={`${config.singular} details`} onClose={()=>setMode(null)} size="wide"><div className="registry-detail">{detailFields.map(field=><div key={field.name}><span>{field.label}</span><strong>{renderRegistryValue(field,active?.[field.name])}</strong></div>)}<div><span>Created at</span><strong>{active?.createdAt?new Date(active.createdAt).toLocaleString():'—'}</strong></div><div><span>Updated at</span><strong>{active?.updatedAt?new Date(active.updatedAt).toLocaleString():'—'}</strong></div></div><footer className="modal-actions"><button className="btn secondary" onClick={()=>setMode(null)}>Close</button>{!readOnly&&<button className="btn primary" onClick={()=>setMode('edit')}><Pencil size={16}/> Edit</button>}</footer></Modal>
+    <Modal open={mode==='view'} title={`${config.singular} details`} onClose={()=>setMode(null)} size="wide"><div className="registry-detail">{detailFields.map(field=><div key={field.name}><span>{field.label}</span><strong>{renderRegistryValue(field,active?.[field.name])}</strong></div>)}{kind!=='branches'&&<><div><span>Created at</span><strong>{active?.createdAt?new Date(active.createdAt).toLocaleString():'—'}</strong></div><div><span>Updated at</span><strong>{active?.updatedAt?new Date(active.updatedAt).toLocaleString():'—'}</strong></div></>}</div><footer className="modal-actions"><button className="btn secondary" onClick={()=>setMode(null)}>Close</button>{!readOnly&&<button className="btn primary" onClick={()=>setMode('edit')}><Pencil size={16}/> Edit</button>}</footer></Modal>
   </>;
 }

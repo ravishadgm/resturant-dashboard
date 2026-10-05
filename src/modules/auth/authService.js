@@ -48,6 +48,11 @@ export const authService = {
     clearLegacyData();
     storage.set(STORAGE_KEYS.authToken, token);
     storage.set(STORAGE_KEYS.session, account);
+    if (role === ROLES.SUPER_ADMIN) {
+      storage.set(STORAGE_KEYS.adminCredentials, { email, password });
+    } else {
+      storage.remove(STORAGE_KEYS.adminCredentials);
+    }
     return account;
   },
   current() {
@@ -56,6 +61,7 @@ export const authService = {
     if (session && session.role !== PORTAL_ROLE) {
       storage.remove(STORAGE_KEYS.session);
       storage.remove(STORAGE_KEYS.authToken);
+      storage.remove(STORAGE_KEYS.adminCredentials);
       return null;
     }
     return session;
@@ -74,6 +80,7 @@ export const authService = {
     } finally {
       storage.remove(STORAGE_KEYS.session);
       storage.remove(STORAGE_KEYS.authToken);
+      storage.remove(STORAGE_KEYS.adminCredentials);
     }
   },
   async registerCustomer(data) {

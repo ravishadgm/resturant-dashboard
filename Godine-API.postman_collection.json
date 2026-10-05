@@ -1,10 +1,11 @@
 {
   "info": {
-    "_postman_id": "e8eb07d4-c265-4ddd-b025-bbb85cba8a52",
+    "_postman_id": "6d8a85fd-f0c0-4afb-8a60-5ab0d35dec8e",
     "name": "Godine - Restaurant Queue API",
+    "description": "Single collection — Auth, Admin, Restaurant, Manager, Customer.\n\nIncludes: wait-time (2 category + per-user ETA), fixed time-slot scheduling, cron batch notifications, admin customer create with password.\n\nNote: Restaurant create/update = faktu form-data (logo) wala. Admin table add (POST /admin/tables) removed — admin table manage nathi kare.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "12436153",
-    "_collection_link": "https://go.postman.co/collection/12436153-e8eb07d4-c265-4ddd-b025-bbb85cba8a52?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/12436153-6d8a85fd-f0c0-4afb-8a60-5ab0d35dec8e?source=collection_link"
   },
   "item": [
     {
@@ -43,9 +44,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}",
-                      "if(j.data&&j.data.token){pm.collectionVariables.set('token',j.data.token);}",
-                      "if(j.data&&j.data.user){pm.collectionVariables.set('user_id',j.data.user.user_id);}"
+                      "var j={}; try{j=pm.response.json();}catch(e){}\nif(j.data&&j.data.token){pm.collectionVariables.set('admin_token',j.data.token);}"
                     ]
                   }
                 }
@@ -60,7 +59,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"email\":\"admin@godine.local\",\"password\":\"Admin@123\"}",
+                  "raw": "{\r\n    \"email\": \"admin@godine.local\",\r\n    \"password\": \"Admin@123\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -118,7 +117,17 @@
               },
               "response": []
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{admin_token}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "Restaurant",
@@ -131,8 +140,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}",
-                      "if(j.data&&j.data.token){pm.collectionVariables.set('token',j.data.token);}"
+                      "var j={}; try{j=pm.response.json();}catch(e){}\nif(j.data&&j.data.token){pm.collectionVariables.set('restaurant_token',j.data.token);}"
                     ]
                   }
                 }
@@ -147,7 +155,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"email\":\"rest1@test.com\",\"password\":\"Rest@123\"}",
+                  "raw": "{\r\n    \"email\": \"rest1@test.com\",\r\n    \"password\": \"Rest@123\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -205,7 +213,17 @@
               },
               "response": []
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{restaurant_token}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "Manager",
@@ -218,8 +236,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}",
-                      "if(j.data&&j.data.token){pm.collectionVariables.set('token',j.data.token);}"
+                      "var j={}; try{j=pm.response.json();}catch(e){}\nif(j.data&&j.data.token){pm.collectionVariables.set('manager_token',j.data.token);}"
                     ]
                   }
                 }
@@ -234,7 +251,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"email\":\"manager1@test.com\",\"password\":\"Mgr@123\"}",
+                  "raw": "{\r\n    \"email\": \"manager1@test.com\",\r\n    \"password\": \"Mgr@123\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -292,21 +309,30 @@
               },
               "response": []
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{manager_token}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
-          "name": "Customer",
+          "name": "Branch",
           "item": [
             {
-              "name": "Customer - Login",
+              "name": "Branch Owner - Login",
               "event": [
                 {
                   "listen": "test",
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}",
-                      "if(j.data&&j.data.token){pm.collectionVariables.set('token',j.data.token);}"
+                      "var j={}; try{j=pm.response.json();}catch(e){}\r\nif(j.data&&j.data.token){pm.collectionVariables.set('branch_token',j.data.token);}"
                     ]
                   }
                 }
@@ -321,7 +347,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"email\":\"cust1@test.com\",\"password\":\"Cust@123\"}",
+                  "raw": "{\r\n    \"email\":\"branch1@gmail.com\",\r\n    \"password\":\"12345678\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -329,7 +355,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/auth/customer/login",
+                  "raw": "{{baseUrl}}/api/v1/auth/branch/login",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -337,7 +363,7 @@
                     "api",
                     "v1",
                     "auth",
-                    "customer",
+                    "branch",
                     "login"
                   ]
                 }
@@ -345,20 +371,7 @@
               "response": []
             },
             {
-              "name": "Customer - Register",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}",
-                      "if(j.data&&j.data.token){pm.collectionVariables.set('token',j.data.token);}",
-                      "if(j.data&&j.data.customer){pm.collectionVariables.set('customer_id',j.data.customer.customer_id);}"
-                    ]
-                  }
-                }
-              ],
+              "name": "Branch Owner - Logout",
               "request": {
                 "method": "POST",
                 "header": [
@@ -369,7 +382,57 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"name\":\"Test Customer\",\"email\":\"cust1@test.com\",\"phone\":\"9876543210\",\"password\":\"Cust@123\"}",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/branch/logout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "branch",
+                    "logout"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{branch_token}}",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Customer",
+          "item": [
+            {
+              "name": "Customer - Register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Test Customer\",\r\n    \"email\": \"cust123@test.com\",\r\n    \"phone\": \"9876543210\",\r\n    \"password\": \"Cust@123\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -387,6 +450,52 @@
                     "auth",
                     "customer",
                     "register"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Customer - Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "var j={}; try{j=pm.response.json();}catch(e){}\nif(j.data&&j.data.token){pm.collectionVariables.set('customer_token',j.data.token);}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"cust123@test.com\",\r\n    \"password\": \"Cust@123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/customer/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "customer",
+                    "login"
                   ]
                 }
               },
@@ -426,7 +535,22 @@
                 }
               },
               "response": []
-            },
+            }
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{customer_token}}",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        {
+          "name": "Common",
+          "item": [
             {
               "name": "Me",
               "request": {
@@ -458,38 +582,7 @@
           "name": "Restaurant",
           "item": [
             {
-              "name": "Dashboard",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/dashboard",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "v1",
-                    "admin",
-                    "dashboard"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
               "name": "Restaurant - Create (form-data + logo)",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}\nif(j.data&&j.data.restaurant){pm.collectionVariables.set('restaurant_id',j.data.restaurant.restaurant_id);}"
-                    ]
-                  }
-                }
-              ],
               "request": {
                 "method": "POST",
                 "header": [],
@@ -540,9 +633,8 @@
                       "key": "logo",
                       "type": "file",
                       "src": [
-                        "uploads/res_img/logo.png"
-                      ],
-                      "disabled": true
+                        "/F:/Vishal/My Projects/Website_Assets/Images/bgslider.jpeg"
+                      ]
                     }
                   ]
                 },
@@ -556,6 +648,26 @@
                     "v1",
                     "admin",
                     "restaurants"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Dashboard",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/dashboard",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "dashboard"
                   ]
                 }
               },
@@ -616,14 +728,12 @@
                     {
                       "key": "logo",
                       "type": "file",
-                      "src": [
-                        "/F:/Vishal/Demo websites codes/tailadmin-react---tailwind-react-dashboard-template/free-react-tailwind-admin-dashboard-main/src/images/product/product-01.png"
-                      ]
+                      "src": "uploads/res_img/logo.png"
                     }
                   ]
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/restaurants/{{restaurant_id}}",
+                  "raw": "{{baseUrl}}/api/v1/admin/restaurants/1",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -632,7 +742,7 @@
                     "v1",
                     "admin",
                     "restaurants",
-                    "{{restaurant_id}}"
+                    "1"
                   ]
                 }
               },
@@ -655,7 +765,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"restaurant_id\": 1,\r\n    \"name\": \"Admin Branch\",\r\n    \"city\": \"Surat\",\r\n    \"email\":\"admin@spicehub.com\",\r\n    \"phone\" : 1234567890,\r\n    \"latitude\": 21.21,\r\n    \"longitude\": 72.78\r\n}",
+                  "raw": "{\r\n    \"restaurant_id\": \"2\",\r\n    \"name\": \"Admin Branch\",\r\n    \"address\":\"Punagam\",\r\n    \"city\": \"Surat\",\r\n    \"latitude\": 21.21,\r\n    \"longitude\": 72.78,\r\n    \"slot_interval_minutes\": 30,\r\n    \"slot_capacity\": 20,\r\n    \"advance_booking_days\": 2,\r\n    \"notify_lead_minutes\": 15,\r\n    \"queue_enabled\":true,\r\n    \"owner_name\":\"Branch_owner\",\r\n    \"owner_email\":\"branch1@gmail.com\",\r\n    \"owner_phone\":\"1234567890\",\r\n    \"owner_password\":\"12345678\",\r\n    \"rating\":4.5,\r\n    \"map_url\":\"https://maps.google.com/maps?vet=10CAAQoqAOahcKEwiQi6nSg52XAxUAAAAAHQAAAAAQBQ..i&rlz=1C1CHBF_enIN1130IN1130&udm&fvr=1&pvq=Cg0vZy8xMXlnNWoxemxoIhAKCnJlc3RhdXJhbnQQAhgDiQHDy8_t-BoT2A&lqi=CgpyZXN0YXVyYW50SM_0g9i4vYCACFoWEAAYACIKcmVzdGF1cmFudCoECAMQAJIBCnJlc3RhdXJhbnQ&cs=1&um=1&ie=UTF-8&fb=1&gl=in&sa=X&ftid=0x3be04f6e65ca41df:0xd8131af8edcfcbc3\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -683,7 +793,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/branches?page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/admin/branches?page=1&limit=10",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -704,7 +814,8 @@
                     },
                     {
                       "key": "search",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -723,7 +834,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"name\": \"Admin Branch\",\r\n    \"city\": \"Surat\",\r\n    \"email\":\"admin@spicehub.com\",\r\n    \"phone\" : 1234567890,\r\n    \"latitude\": 21.21,\r\n    \"longitude\": 72.78\r\n}",
+                  "raw": "{\r\n    \"restaurant_id\": \"2\",\r\n    \"name\": \"Admin Branch\",\r\n    \"address\":\"Punagam\",\r\n    \"city\": \"Surat\",\r\n    \"latitude\": 21.21,\r\n    \"longitude\": 72.78,\r\n    \"slot_interval_minutes\": 30,\r\n    \"slot_capacity\": 20,\r\n    \"advance_booking_days\": 2,\r\n    \"notify_lead_minutes\": 15,\r\n    \"queue_enabled\":true,\r\n    \"owner_name\":\"Branch_owner\",\r\n    \"owner_email\":\"branch1@gmail.com\",\r\n    \"owner_phone\":\"1234567890\",\r\n    \"owner_password\":\"12345678\",\r\n    \"rating\":4.5,\r\n    \"map_url\":\"https://maps.google.com/maps?vet=10CAAQoqAOahcKEwiQi6nSg52XAxUAAAAAHQAAAAAQBQ..i&rlz=1C1CHBF_enIN1130IN1130&udm&fvr=1&pvq=Cg0vZy8xMXlnNWoxemxoIhAKCnJlc3RhdXJhbnQQAhgDiQHDy8_t-BoT2A&lqi=CgpyZXN0YXVyYW50SM_0g9i4vYCACFoWEAAYACIKcmVzdGF1cmFudCoECAMQAJIBCnJlc3RhdXJhbnQ&cs=1&um=1&ie=UTF-8&fb=1&gl=in&sa=X&ftid=0x3be04f6e65ca41df:0xd8131af8edcfcbc3\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -731,7 +842,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/branches/{{branch_id}}",
+                  "raw": "{{baseUrl}}/api/v1/admin/branches/1",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -740,7 +851,7 @@
                     "v1",
                     "admin",
                     "branches",
-                    "{{branch_id}}"
+                    "1"
                   ]
                 }
               },
@@ -757,7 +868,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/managers?page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/admin/managers?page=1&limit=10",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -778,7 +889,8 @@
                     },
                     {
                       "key": "search",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -826,6 +938,40 @@
               "response": []
             },
             {
+              "name": "Customer - Create (with password)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"New Customer\",\r\n    \"email\": \"newcust@test.com\",\r\n    \"phone\": \"9876500011\",\r\n    \"password\": \"Cust@123\",\r\n    \"status\": \"ACTIVE\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/customers",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "customers"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
               "name": "Customer - Status",
               "request": {
                 "method": "PATCH",
@@ -837,7 +983,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"status\": \"ACTIVE\"\r\n}",
+                  "raw": "{\r\n    \"status\": \"INACTIVE\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -845,7 +991,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/customers/{{customer_id}}/status",
+                  "raw": "{{baseUrl}}/api/v1/admin/customers/32/status",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -854,7 +1000,7 @@
                     "v1",
                     "admin",
                     "customers",
-                    "{{customer_id}}",
+                    "32",
                     "status"
                   ]
                 }
@@ -867,46 +1013,12 @@
           "name": "Table",
           "item": [
             {
-              "name": "Table - Create",
-              "request": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n    \"branch_id\": 1,\r\n    \"table_number\": \"T9\",\r\n    \"capacity\": 4,\r\n    \"status\": \"AVAILABLE\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/tables",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "v1",
-                    "admin",
-                    "tables"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
               "name": "Table - List",
               "request": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/admin/tables?page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/admin/tables?page=1&limit=10",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -927,8 +1039,85 @@
                     },
                     {
                       "key": "search",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Schedule",
+          "item": [
+            {
+              "name": "Schedule - List",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/schedules?page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "schedules"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Cron - Run Schedule Reminder",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/cron/schedules/run",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "cron",
+                    "schedules",
+                    "run"
                   ]
                 }
               },
@@ -1024,11 +1213,46 @@
             }
           ]
         }
-      ]
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{admin_token}}",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "name": "Restaurant",
       "item": [
+        {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "Dashboard - Overview",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/restaurant/dashboard",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "restaurant",
+                    "dashboard"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
         {
           "name": "Profile",
           "item": [
@@ -1037,40 +1261,6 @@
               "request": {
                 "method": "GET",
                 "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/v1/restaurant/profile",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "v1",
-                    "restaurant",
-                    "profile"
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
-              "name": "Profile - Update",
-              "request": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\"description\":\"My updated story\"}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
                 "url": {
                   "raw": "{{baseUrl}}/api/v1/restaurant/profile",
                   "host": [
@@ -1132,7 +1322,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/restaurant/branches?page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/restaurant/branches?page=1&limit=10",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1153,7 +1343,8 @@
                     },
                     {
                       "key": "search",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -1166,7 +1357,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/restaurant/branches/{{branch_id}}",
+                  "raw": "{{baseUrl}}/api/v1/restaurant/branches/1",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1175,26 +1366,36 @@
                     "v1",
                     "restaurant",
                     "branches",
-                    "{{branch_id}}"
+                    "1"
                   ]
                 }
               },
               "response": []
             },
             {
-              "name": "Branch - Create",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}",
-                      "if(j.data&&j.data.branch_id){pm.collectionVariables.set('branch_id',j.data.branch_id);}"
-                    ]
-                  }
+              "name": "Branch - Schedule Get (weekly timing)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/restaurant/branches/1/schedules",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "restaurant",
+                    "branches",
+                    "1",
+                    "schedules"
+                  ]
                 }
-              ],
+              },
+              "response": []
+            },
+            {
+              "name": "Branch - Schedule Set / Update (weekly timing)",
               "request": {
                 "method": "POST",
                 "header": [
@@ -1205,7 +1406,43 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"restaurant_id\":\"{{restaurant_id}}\",\"name\":\"Adajan Branch\",\"address\":\"Adajan, Surat\",\"city\":\"Surat\",\"latitude\":21.21,\"longitude\":72.78,\"phone\":\"9122222222\"}",
+                  "raw": "{\n  \"schedules\": [\n    { \"day_of_week\": \"MONDAY\", \"open_time\": \"09:00\", \"close_time\": \"21:00\", \"is_closed\": false },\n    { \"day_of_week\": \"TUESDAY\", \"open_time\": \"09:00\", \"close_time\": \"21:00\", \"is_closed\": false },\n    { \"day_of_week\": \"WEDNESDAY\", \"open_time\": \"09:00\", \"close_time\": \"21:00\", \"is_closed\": false },\n    { \"day_of_week\": \"THURSDAY\", \"open_time\": \"09:00\", \"close_time\": \"21:00\", \"is_closed\": false },\n    { \"day_of_week\": \"FRIDAY\", \"open_time\": \"09:00\", \"close_time\": \"22:00\", \"is_closed\": false },\n    { \"day_of_week\": \"SATURDAY\", \"open_time\": \"10:00\", \"close_time\": \"23:00\", \"is_closed\": false },\n    { \"day_of_week\": \"SUNDAY\", \"is_closed\": true }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/restaurant/branches/1/schedules",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "restaurant",
+                    "branches",
+                    "1",
+                    "schedules"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Branch - Create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"restaurant_id\": \"2\",\n    \"name\": \"Admin Branch\",\n    \"address\":\"Punagam\",\n    \"city\": \"Surat\",\n    \"latitude\": 21.21,\n    \"longitude\": 72.78,\n    \"slot_interval_minutes\": 30,\n    \"slot_capacity\": 20,\n    \"advance_booking_days\": 2,\n    \"notify_lead_minutes\": 15,\n    \"queue_enabled\":true,\n    \"owner_name\":\"Branch_owner\",\n    \"owner_email\":\"branch1@gmail.com\",\n    \"owner_phone\":\"1234567890\",\n    \"owner_password\":\"12345678\",\n    \"rating\":4.5,\n    \"map_url\":\"https://maps.google.com/maps?vet=10CAAQoqAOahcKEwiQi6nSg52XAxUAAAAAHQAAAAAQBQ..i&rlz=1C1CHBF_enIN1130IN1130&udm&fvr=1&pvq=Cg0vZy8xMXlnNWoxemxoIhAKCnJlc3RhdXJhbnQQAhgDiQHDy8_t-BoT2A&lqi=CgpyZXN0YXVyYW50SM_0g9i4vYCACFoWEAAYACIKcmVzdGF1cmFudCoECAMQAJIBCnJlc3RhdXJhbnQ&cs=1&um=1&ie=UTF-8&fb=1&gl=in&sa=X&ftid=0x3be04f6e65ca41df:0xd8131af8edcfcbc3\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1239,7 +1476,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"phone\":\"9133333333\",\"queue_enabled\":true}",
+                  "raw": "{\r\n    \"restaurant_id\": \"2\",\r\n    \"name\": \"Admin Branch\",\r\n    \"address\":\"Punagam\",\r\n    \"city\": \"Surat\",\r\n    \"latitude\": 21.21,\r\n    \"longitude\": 72.78,\r\n    \"slot_interval_minutes\": 30,\r\n    \"slot_capacity\": 20,\r\n    \"advance_booking_days\": 2,\r\n    \"notify_lead_minutes\": 15,\r\n    \"queue_enabled\":true,\r\n    \"owner_name\":\"Branch_owner\",\r\n    \"owner_email\":\"branch1@gmail.com\",\r\n    \"owner_phone\":\"1234567890\",\r\n    \"owner_password\":\"12345678\",\r\n    \"rating\":4.5,\r\n    \"map_url\":\"https://maps.google.com/maps?vet=10CAAQoqAOahcKEwiQi6nSg52XAxUAAAAAHQAAAAAQBQ..i&rlz=1C1CHBF_enIN1130IN1130&udm&fvr=1&pvq=Cg0vZy8xMXlnNWoxemxoIhAKCnJlc3RhdXJhbnQQAhgDiQHDy8_t-BoT2A&lqi=CgpyZXN0YXVyYW50SM_0g9i4vYCACFoWEAAYACIKcmVzdGF1cmFudCoECAMQAJIBCnJlc3RhdXJhbnQ&cs=1&um=1&ie=UTF-8&fb=1&gl=in&sa=X&ftid=0x3be04f6e65ca41df:0xd8131af8edcfcbc3\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1247,7 +1484,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/restaurant/branches/{{branch_id}}",
+                  "raw": "{{baseUrl}}/api/v1/restaurant/branches/1",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1256,7 +1493,7 @@
                     "v1",
                     "restaurant",
                     "branches",
-                    "{{branch_id}}"
+                    "1"
                   ]
                 }
               },
@@ -1273,7 +1510,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/restaurant/managers?branch_id={{branch_id}}&page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/restaurant/managers?branch_id=1&page=1&limit=10",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1286,7 +1523,7 @@
                   "query": [
                     {
                       "key": "branch_id",
-                      "value": "{{branch_id}}"
+                      "value": "1"
                     },
                     {
                       "key": "page",
@@ -1298,7 +1535,8 @@
                     },
                     {
                       "key": "search",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -1317,7 +1555,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"name\":\"Branch Manager\",\"email\":\"manager1@test.com\",\"phone\":\"9144444444\",\"password\":\"Mgr@123\",\"branch_id\":\"{{branch_id}}\"}",
+                  "raw": "{\r\n    \"name\": \"Branch Manager\",\r\n    \"email\": \"manager1@test.com\",\r\n    \"phone\": \"9144444444\",\r\n    \"password\": \"Mgr@123\",\r\n    \"branch_id\": \"1\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1350,7 +1588,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/restaurant/tables?branch_id={{branch_id}}&page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/restaurant/tables?branch_id=1&page=1&limit=10",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1363,7 +1601,7 @@
                   "query": [
                     {
                       "key": "branch_id",
-                      "value": "{{branch_id}}"
+                      "value": "1"
                     },
                     {
                       "key": "page",
@@ -1375,7 +1613,8 @@
                     },
                     {
                       "key": "search",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -1384,18 +1623,6 @@
             },
             {
               "name": "Table - Create",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}",
-                      "if(j.data&&j.data.table_id){pm.collectionVariables.set('table_id',j.data.table_id);}"
-                    ]
-                  }
-                }
-              ],
               "request": {
                 "method": "POST",
                 "header": [
@@ -1406,7 +1633,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"branch_id\":\"{{branch_id}}\",\"table_number\":\"T1\",\"capacity\":4,\"status\":\"AVAILABLE\"}",
+                  "raw": "{\r\n    \"branch_id\": \"1\",\r\n    \"table_number\": \"T2\",\r\n    \"capacity\": 4,\r\n    \"status\": \"AVAILABLE\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1430,7 +1657,370 @@
             }
           ]
         }
-      ]
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{restaurant_token}}",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Branch",
+      "item": [
+        {
+          "name": "Dashboard",
+          "item": [
+            {
+              "name": "Dashboard - Overview",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      ""
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/branch/dashboard",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "branch",
+                    "dashboard"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Profile",
+          "item": [
+            {
+              "name": "Profile - Get",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/branch/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "branch",
+                    "profile"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Profile - Update",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Admin Branch\",\r\n    \"address\":\"Punagam\",\r\n    \"city\": \"Surat\",\r\n    \"latitude\": 21.21,\r\n    \"longitude\": 72.78,\r\n    \"slot_interval_minutes\": 30,\r\n    \"slot_capacity\": 20,\r\n    \"advance_booking_days\": 2,\r\n    \"notify_lead_minutes\": 15,\r\n    \"queue_enabled\":true,\r\n    \"rating\":4.5,\r\n    \"map_url\":\"https://maps.google.com/maps?vet=10CAAQoqAOahcKEwiQi6nSg52XAxUAAAAAHQAAAAAQBQ..i&rlz=1C1CHBF_enIN1130IN1130&udm&fvr=1&pvq=Cg0vZy8xMXlnNWoxemxoIhAKCnJlc3RhdXJhbnQQAhgDiQHDy8_t-BoT2A&lqi=CgpyZXN0YXVyYW50SM_0g9i4vYCACFoWEAAYACIKcmVzdGF1cmFudCoECAMQAJIBCnJlc3RhdXJhbnQ&cs=1&um=1&ie=UTF-8&fb=1&gl=in&sa=X&ftid=0x3be04f6e65ca41df:0xd8131af8edcfcbc3\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/branch/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "branch",
+                    "profile"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Schedule",
+          "item": [
+            {
+              "name": "Schedule - Get (weekly timing)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/branch/schedules",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "branch",
+                    "schedules"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Schedule - Set / Update (weekly timing)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"schedules\": [\n    { \"day_of_week\": \"MONDAY\", \"open_time\": \"09:00\", \"close_time\": \"21:00\", \"is_closed\": false },\n    { \"day_of_week\": \"TUESDAY\", \"open_time\": \"09:00\", \"close_time\": \"21:00\", \"is_closed\": false },\n    { \"day_of_week\": \"WEDNESDAY\", \"open_time\": \"09:00\", \"close_time\": \"21:00\", \"is_closed\": false },\n    { \"day_of_week\": \"THURSDAY\", \"open_time\": \"09:00\", \"close_time\": \"21:00\", \"is_closed\": false },\n    { \"day_of_week\": \"FRIDAY\", \"open_time\": \"09:00\", \"close_time\": \"22:00\", \"is_closed\": false },\n    { \"day_of_week\": \"SATURDAY\", \"open_time\": \"10:00\", \"close_time\": \"23:00\", \"is_closed\": false },\n    { \"day_of_week\": \"SUNDAY\", \"is_closed\": true }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/branch/schedules",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "branch",
+                    "schedules"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Table",
+          "item": [
+            {
+              "name": "Table - List",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/branch/tables?page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "branch",
+                    "tables"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Table - Create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"table_number\": \"T3\",\r\n    \"capacity\": 4,\r\n    \"status\": \"AVAILABLE\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/branch/tables",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "branch",
+                    "tables"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Table - Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"status\":\"AVAILABLE\"}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/branch/tables/1/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "branch",
+                    "tables",
+                    "1",
+                    "status"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Customer",
+          "item": [
+            {
+              "name": "Customer - List",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/branch/customers?page=1&limit=10&search=",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "branch",
+                    "customers"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "search",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Queue",
+          "item": [
+            {
+              "name": "Queue - List",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/branch/queue?page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "branch",
+                    "queue"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{branch_token}}",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "name": "Manager",
@@ -1469,7 +2059,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/manager/customers?page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/manager/customers?page=1&limit=10",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1490,7 +2080,8 @@
                     },
                     {
                       "key": "search",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -1499,18 +2090,6 @@
             },
             {
               "name": "Customer - Add",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}",
-                      "if(j.data&&j.data.queue_id){pm.collectionVariables.set('queue_id',j.data.queue_id);}"
-                    ]
-                  }
-                }
-              ],
               "request": {
                 "method": "POST",
                 "header": [
@@ -1521,7 +2100,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"phone\":\"9876543210\",\"name\":\"Walkin User\",\"member_count\":3}",
+                  "raw": "{\r\n    \"phone\": \"9876543210\",\r\n    \"name\": \"Walkin User\",\r\n    \"member_count\": 3\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1554,7 +2133,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/manager/queue?branch_id={{branch_id}}&page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/manager/queue?page=1&limit=10&search=",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1565,10 +2144,6 @@
                     "queue"
                   ],
                   "query": [
-                    {
-                      "key": "branch_id",
-                      "value": "{{branch_id}}"
-                    },
                     {
                       "key": "page",
                       "value": "1"
@@ -1606,7 +2181,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/manager/queue/{{queue_id}}/status",
+                  "raw": "{{baseUrl}}/api/v1/manager/queue/1/status",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1615,7 +2190,7 @@
                     "v1",
                     "manager",
                     "queue",
-                    "{{queue_id}}",
+                    "1",
                     "status"
                   ]
                 }
@@ -1634,7 +2209,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"table_ids\":[\"{{table_id}}\"]}",
+                  "raw": "{\"table_ids\":[\"1\"]}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1642,7 +2217,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/queue/{{queue_id}}/assign-tables",
+                  "raw": "{{baseUrl}}/api/v1/queue/1/assign-tables",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1650,7 +2225,7 @@
                     "api",
                     "v1",
                     "queue",
-                    "{{queue_id}}",
+                    "1",
                     "assign-tables"
                   ]
                 }
@@ -1668,7 +2243,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/manager/tables?branch_id={{branch_id}}&page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/manager/tables?page=1&limit=10&search=",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1679,10 +2254,6 @@
                     "tables"
                   ],
                   "query": [
-                    {
-                      "key": "branch_id",
-                      "value": "{{branch_id}}"
-                    },
                     {
                       "key": "page",
                       "value": "1"
@@ -1720,7 +2291,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/manager/tables/{{table_id}}/status",
+                  "raw": "{{baseUrl}}/api/v1/manager/tables/1/status",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1729,7 +2300,7 @@
                     "v1",
                     "manager",
                     "tables",
-                    "{{table_id}}",
+                    "1",
                     "status"
                   ]
                 }
@@ -1777,7 +2348,17 @@
             }
           ]
         }
-      ]
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{manager_token}}",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "name": "Customer",
@@ -1817,7 +2398,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"name\":\"Test Customer\",\"phone\":\"9876543210\"}",
+                  "raw": "{\r\n    \"name\": \"Test Customer\",\r\n    \"phone\": \"9876543219\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1879,46 +2460,12 @@
           "name": "Restaurant",
           "item": [
             {
-              "name": "Restaurant - List",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/api/v1/customer/restaurants?page=1&limit=10&search=",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "api",
-                    "v1",
-                    "customer",
-                    "restaurants"
-                  ],
-                  "query": [
-                    {
-                      "key": "page",
-                      "value": "1"
-                    },
-                    {
-                      "key": "limit",
-                      "value": "10"
-                    },
-                    {
-                      "key": "search",
-                      "value": ""
-                    }
-                  ]
-                }
-              },
-              "response": []
-            },
-            {
               "name": "Restaurant - Nearby",
               "request": {
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/customer/restaurants/nearby?lat=21.21&lng=72.78&radius=10&page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/customer/restaurants/nearby?lat=21.21&lng=72.78&radius=10&page=1&limit=10",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1952,8 +2499,206 @@
                     },
                     {
                       "key": "search",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Schedule",
+          "item": [
+            {
+              "name": "Schedule - Slots",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}\nif(j.data&&j.data.slots&&j.data.slots.length){\n  var s=j.data.slots.filter(function(x){return x.is_available;})[0]||j.data.slots[j.data.slots.length-1];\n  if(s){pm.collectionVariables.set('today_slot_start',s.slot_start);}\n}"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/customer/schedules/slots?branch_id=1&page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "customer",
+                    "schedules",
+                    "slots"
+                  ],
+                  "query": [
+                    {
+                      "key": "branch_id",
+                      "value": "1"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Schedule - Create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"branch_id\": \"1\",\r\n    \"slot_start\": \"10:00\",\r\n    \"member_count\": 2\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/customer/schedules",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "customer",
+                    "schedules"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Schedule - My",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/customer/schedules?page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "customer",
+                    "schedules"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Schedule - Register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/customer/schedules/1/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "customer",
+                    "schedules",
+                    "1",
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Schedule - Cancel",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/customer/schedules/1/cancel",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "customer",
+                    "schedules",
+                    "1",
+                    "cancel"
                   ]
                 }
               },
@@ -1970,7 +2715,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/customer/queue?page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/customer/queue?page=1&limit=10",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1991,7 +2736,8 @@
                     },
                     {
                       "key": "search",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -2000,18 +2746,6 @@
             },
             {
               "name": "Queue - Join",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "var j={}; try{j=JSON.parse(responseBody);}catch(e){}",
-                      "if(j.data&&j.data.queue_id){pm.collectionVariables.set('queue_id',j.data.queue_id);}"
-                    ]
-                  }
-                }
-              ],
               "request": {
                 "method": "POST",
                 "header": [
@@ -2022,7 +2756,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"branch_id\":\"{{branch_id}}\",\"member_count\":2}",
+                  "raw": "{\r\n    \"branch_id\": \"1\",\r\n    \"member_count\": 4\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -2078,7 +2812,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"status\":\"CANCELLED\"}",
+                  "raw": "{\r\n    \"status\": \"CANCELLED\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -2086,7 +2820,7 @@
                   }
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/customer/queue/{{queue_id}}/cancel",
+                  "raw": "{{baseUrl}}/api/v1/customer/queue/1/cancel",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -2095,8 +2829,84 @@
                     "v1",
                     "customer",
                     "queue",
-                    "{{queue_id}}",
+                    "1",
                     "cancel"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Notification",
+          "item": [
+            {
+              "name": "Notification - List",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/customer/notifications?page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "customer",
+                    "notifications"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Notification - Mark Read",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/customer/notifications/1/read",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "customer",
+                    "notifications",
+                    "1",
+                    "read"
                   ]
                 }
               },
@@ -2113,7 +2923,7 @@
                 "method": "GET",
                 "header": [],
                 "url": {
-                  "raw": "{{baseUrl}}/api/v1/customer/tokens?page=1&limit=10&search=",
+                  "raw": "{{baseUrl}}/api/v1/customer/tokens?page=1&limit=10",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -2134,7 +2944,8 @@
                     },
                     {
                       "key": "search",
-                      "value": ""
+                      "value": "",
+                      "disabled": true
                     }
                   ]
                 }
@@ -2153,7 +2964,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"device_type\":\"Android\",\"device_token\":\"FCM_TEST_TOKEN\",\"device_id\":\"dev1\"}",
+                  "raw": "{\r\n    \"device_type\": \"Android\",\r\n    \"device_token\": \"FCM_TEST_TOKEN\",\r\n    \"device_id\": \"dev1\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -2177,51 +2988,52 @@
             }
           ]
         }
-      ]
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{customer_token}}",
+            "type": "string"
+          }
+        ]
+      }
     }
   ],
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{token}}",
-        "type": "string"
-      }
-    ]
-  },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:5000"
+      "value": "https://godine.cloud"
     },
     {
-      "key": "token",
+      "key": "admin_token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3OTA5MjM0ODUsImV4cCI6MTc5MTUyODI4NX0._qZliEJqydfcO9TuhrxSn_cLKtbJulNa82RXT-M05B4"
+    },
+    {
+      "key": "restaurant_token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoiUkVTVEFVUkFOVCIsImlhdCI6MTc5MDkyMzQ5MSwiZXhwIjoxNzkxNTI4MjkxfQ.lnpVzOx30yVs_Nbj3YwOizHN56BOUUy5pnhXj-eCynU"
+    },
+    {
+      "key": "manager_token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4LCJyb2xlIjoiTUFOQUdFUiIsImlhdCI6MTc5MDkyMzQ5NiwiZXhwIjoxNzkxNTI4Mjk2fQ.tM3i8hT_utUN1j_xrshlObmeHpLXcJbYIwGoRl78OnA"
+    },
+    {
+      "key": "branch_token",
       "value": ""
     },
     {
-      "key": "user_id",
+      "key": "customer_token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNCwicm9sZSI6IkNVU1RPTUVSIiwiaWF0IjoxNzkwOTIzNTAzLCJleHAiOjE3OTE1MjgzMDN9.caYWgPnopExeofuRriuyKpiiSgaXQAK3JnHEJdekiSw"
+    },
+    {
+      "key": "today_slot_start",
       "value": ""
     },
     {
-      "key": "customer_id",
-      "value": ""
-    },
-    {
-      "key": "restaurant_id",
-      "value": "1"
-    },
-    {
-      "key": "branch_id",
-      "value": "1"
-    },
-    {
-      "key": "table_id",
-      "value": "1"
-    },
-    {
-      "key": "queue_id",
-      "value": "1"
+      "key": "baseUrl",
+      "value": "",
+      "disabled": true
     }
   ]
 }

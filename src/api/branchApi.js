@@ -1,4 +1,6 @@
 import { apiClient } from './apiClient';
+import { storage } from '../services/storageService';
+import { ROLES, STORAGE_KEYS } from '../utils/constants';
 
 const listRequests = new Map();
 
@@ -8,6 +10,7 @@ const clearListCache = (response) => {
 };
 
 const createPayload = (details, scope) => {
+  if (scope === 'admin') return adminPayload(details);
   const payload = {
     restaurant_id: Number(details.restaurant_id),
     name: details.name,
@@ -22,6 +25,7 @@ const createPayload = (details, scope) => {
 };
 
 const updatePayload = (details, scope) => {
+  if (scope === 'admin') return adminPayload(details);
   const payload = {
     name: details.name,
     city: details.city,
@@ -39,6 +43,33 @@ const updatePayload = (details, scope) => {
     payload.email = details.email;
   }
   return payload;
+};
+
+const adminPayload = (details) => {
+  const credentials = storage.get(STORAGE_KEYS.adminCredentials);
+  const session = storage.get(STORAGE_KEYS.session);
+  if (session?.role !== ROLES.SUPER_ADMIN || !credentials?.email || !credentials?.password) {
+    throw new Error('Please log in again to use your admin credentials for this branch.');
+  }
+  return {
+    restaurant_id: Number(details.restaurant_id),
+    name: details.name,
+    address: details.address,
+    city: details.city,
+    latitude: Number(details.latitude),
+    longitude: Number(details.longitude),
+    slot_interval_minutes: Number(details.slot_interval_minutes),
+    slot_capacity: Number(details.slot_capacity),
+    advance_booking_days: Number(details.advance_booking_days),
+    notify_lead_minutes: Number(details.notify_lead_minutes),
+    queue_enabled: details.queue_enabled === true || details.queue_enabled === 'true',
+    owner_name: session.name || session.full_name,
+    owner_email: credentials.email,
+    owner_phone: session.phone || session.phone_number || '',
+    owner_password: credentials.password,
+    rating: Number(details.rating),
+    map_url: details.map_url,
+  };
 };
 
 export const branchApi = {

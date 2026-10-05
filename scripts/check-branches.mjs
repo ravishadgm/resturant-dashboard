@@ -1,0 +1,62 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+
+const read = path => fs.readFileSync(path, 'utf8');
+const plain = path => read(path).replace(/^import .*;\r?\n/gm, '').replace(/export /g, '');
+const values = new Map();
+const requests = [];
+const storage = { get: key => values.get(key) ?? null, set: (key, value) => values.set(key, value), remove: key => values.delete(key) };
+const apiClient = Object.fromEntries(['post', 'put', 'get'].map(method => [method, async (path, body) => { requests.push({ method, path, body }); return { success: true }; }]));
+const authApi = { adminLogin: async ({ email }) => ({ data: { token: 'test-token', user: { email, name: 'Admin', phone: '9876543210' } } }), adminLogout: async () => {} };
+const context = vm.createContext({ storage, apiClient, authApi });
+vm.runInContext(plain('src/utils/portal.js') + plain('src/utils/constants.js') + plain('src/modules/auth/authService.js') + plain('src/api/branchApi.js') + '\nglobalThis.result = { authService, branchApi, STORAGE_KEYS };', context);
+const { authService, branchApi, STORAGE_KEYS } = context.result;
+await authService.login('admin@example.com', 'test-admin-password');
+assert.equal(values.get(STORAGE_KEYS.adminCredentials).password, 'test-admin-password');
+assert.equal(values.get(STORAGE_KEYS.session).password, undefined);
+
+const collection = JSON.parse(read('Godine-API.postman_collection.json'));
+const admin = collection.item.find(item => item.name === 'Admin');
+const branch = admin.item.find(item => item.name === 'Branch');
+const example = JSON.parse(branch.item.find(item => item.name === 'Branch - Create').request.body.raw);
+const details = { ...example, queue_enabled: 'false', advance_booking_days: '0', notify_lead_minutes: '0', owner_email: 'ignore@example.com', owner_password: 'ignore' };
+await branchApi.create(details);
+await branchApi.update(1, details);
+for (const request of requests) {
+  assert.deepEqual(Object.keys(request.body).sort(), Object.keys(example).sort());
+  assert.equal(request.body.owner_name, 'Admin');
+  assert.equal(request.body.owner_phone, '9876543210');
+  assert.equal(request.body.owner_email, 'admin@example.com');
+  assert.equal(request.body.owner_password, 'test-admin-password');
+  assert.equal(request.body.queue_enabled, false);
+  assert.equal(request.body.advance_booking_days, 0);
+  assert.equal(request.body.notify_lead_minutes, 0);
+  assert.equal(request.body.rating, 4.5);
+  assert.equal(request.body.restaurant_id, 2);
+}
+assert.equal(requests[0].path, '/api/v1/admin/branches');
+assert.equal(requests[1].path, '/api/v1/admin/branches/1');
+await branchApi.create({ restaurant_id: '2', name: 'Restaurant Branch', address: 'Surat', city: 'Surat', phone: '9000000000', latitude: '21.21', longitude: '72.78' }, 'restaurant');
+assert.equal(requests[2].path, '/api/v1/restaurant/branches');
+assert.equal(requests[2].body.owner_password, undefined);
+await authService.logout();
+assert.equal(values.has(STORAGE_KEYS.adminCredentials), false);
+assert.throws(() => branchApi.create(details), /log in again/);
+assert.equal(requests.length, 3);
+
+vm.runInContext(plain('src/utils/validation.js') + '\nglobalThis.validate = validateEntity;', context);
+assert.equal(Object.keys(context.validate({ zero: 0, enabled: false }, [{ name: 'zero' }, { name: 'enabled' }])).length, 0);
+const registry = read('src/modules/operations/RegistryPage.jsx');
+const form = registry.match(/const adminBranchFields=\[[\s\S]*?\];/)[0];
+assert.equal(/owner_name|owner_phone|owner_email|owner_password/.test(form), false);
+const normalize = registry.match(/const normalizeBranch=row=>\([\s\S]*?\);/)[0];
+vm.runInContext('const withoutPassword = account => { if (!account) return account; const { password, ...safe } = account; return safe; };' + normalize + '\nglobalThis.normalize = normalizeBranch;', context);
+const row = context.normalize({ branch_id: 1, restaurant_id: 2, address: null, restaurant: { branch_id: 0, latitude: '21.17020000', longitude: '72.83110000', status: 'ACTIVE', name: 'Spice Hub', address: 'Ring Road', password: 'hidden' } });
+assert.equal(row.address, null);
+assert.equal(row.restaurant_address, 'Ring Road');
+assert.equal(row.restaurant_branch_id, 0);
+assert.equal(row.restaurant_latitude, '21.17020000');
+assert.equal(row.restaurant_status, 'ACTIVE');
+assert.equal(row.restaurant.password, undefined);
+console.log('Branch create/update payloads, credential lifecycle, restaurant scope, hidden form fields, response normalization, and zero/false validation passed.');
