@@ -32,3 +32,14 @@ npm run dev
 Use `git switch restaurant` to run the restaurant version. Stop the dev server before switching branches.
 
 The prebuilt `dist` directory is also committed on each branch for static hosting. Rebuild it whenever frontend code changes.
+
+## Branch Owner portal
+
+The `branch` Git branch hosts the Branch Owner portal independently.
+
+- Login: `POST /api/v1/auth/branch/login` with email and password.
+- Logout: `POST /api/v1/auth/branch/logout` with the stored bearer token.
+- Session keys are isolated under `restrodesk_branch_*`.
+- Only the authenticated account overview is exposed; operational modules can be added with branch-specific APIs.
+- Build: `npm ci` then `npm run build`. Publish `dist` with SPA fallback.
+- Set `VITE_API_BASE_URL` to the API server for this deployment.

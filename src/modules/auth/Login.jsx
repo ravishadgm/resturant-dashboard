@@ -59,7 +59,7 @@ export default function Login() {
         <div className="simple-demo">
           <span>Demo login</span>
           <div className="demo-account-grid">
-            {PORTAL_ROLE === 'super-admin' ? <button type="button" onClick={() => useDemo('admin@godine.local', 'Admin@123')}><ShieldCheck /> Admin</button> : <button type="button" onClick={() => useDemo('rest1@test.com', 'Rest@123')}><Building2 /> Restaurant</button>}
+            {PORTAL_ROLE === 'branch' ? <button type="button" onClick={() => useDemo('branch1@gmail.com', '12345678')}><Building2 /> Branch Owner</button> : PORTAL_ROLE === 'super-admin' ? <button type="button" onClick={() => useDemo('admin@godine.local', 'Admin@123')}><ShieldCheck /> Admin</button> : <button type="button" onClick={() => useDemo('rest1@test.com', 'Rest@123')}><Building2 /> Restaurant</button>}
           </div>
         </div>
       </section>

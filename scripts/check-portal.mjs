@@ -9,7 +9,8 @@ const values = new Map();
 const calls = [];
 const storage = {get: key => values.get(key) ?? null, set: (key, value) => values.set(key, value), remove: key => values.delete(key)};
 const login = role => async () => { calls.push(role); return {data:{token:'test-token',user:{name:'Test User',email:'test@example.com'}}}; };
-const authApi = {adminLogin:login('super-admin'),restaurantLogin:login('restaurant'),adminLogout:async()=>{},restaurantLogout:async()=>{}};
+let logoutFailure = false;
+const authApi = {branchLogin:login('branch'),branchLogout:async()=>{calls.push('branch-logout');if(logoutFailure)throw new Error('offline');},adminLogin:login('super-admin'),restaurantLogin:login('restaurant'),adminLogout:async()=>{},restaurantLogout:async()=>{}};
 const context = vm.createContext({storage,authApi});
 vm.runInContext(portalCode + constantsCode + authCode + '\n globalThis.result={authService,PORTAL,PORTAL_ROLE,STORAGE_KEYS};', context);
 const {authService,PORTAL,PORTAL_ROLE,STORAGE_KEYS} = context.result;
@@ -27,4 +28,12 @@ assert.equal(values.has(STORAGE_KEYS.authToken),false);
 await authService.login('test@example.com','secret');
 await authService.logout();
 assert.equal(authService.current(),null);
+if (PORTAL === 'branch') {
+  assert(calls.includes('branch-logout'));
+  await authService.login('test@example.com','secret');
+  logoutFailure=true;
+  await assert.rejects(authService.logout(),/offline/);
+  assert.equal(authService.current(),null);
+  assert.equal(values.has(STORAGE_KEYS.authToken),false);
+}
 console.log(`${PORTAL}: correct login endpoint, role isolation, session keys, and logout checks passed.`);

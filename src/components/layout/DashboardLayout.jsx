@@ -43,6 +43,7 @@ export default function DashboardLayout() {
     };
   }, [mobile]);
   const roleLinks = {
+    [ROLES.BRANCH]: [[LayoutDashboard, "Overview", "/dashboard"]],
     [ROLES.SUPER_ADMIN]: [
       [LayoutDashboard, "Overview", "/dashboard"],
       [Store, "Restaurants", "/restaurants"],

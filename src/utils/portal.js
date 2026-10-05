@@ -1,3 +1,3 @@
-export const PORTAL = 'restaurant';
-export const PORTAL_ROLE = PORTAL === 'admin' ? 'super-admin' : 'restaurant';
-export const PORTAL_LABEL = PORTAL === 'admin' ? 'Admin Dashboard' : 'Restaurant Dashboard';
+export const PORTAL = 'branch';
+export const PORTAL_ROLE = 'branch';
+export const PORTAL_LABEL = 'Branch Owner Dashboard';
