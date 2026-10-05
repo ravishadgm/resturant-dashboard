@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Armchair,
   Building2,
+  CalendarDays,
   ChevronDown,
   History,
   LayoutDashboard,
@@ -43,7 +44,7 @@ export default function DashboardLayout() {
     };
   }, [mobile]);
   const roleLinks = {
-    [ROLES.BRANCH]: [[LayoutDashboard, "Overview", "/dashboard"]],
+    [ROLES.BRANCH]: [[LayoutDashboard, "Overview", "/dashboard"], [UserRound, "My Profile", "/my-profile"], [CalendarDays, "Schedules", "/schedules"]],
     [ROLES.SUPER_ADMIN]: [
       [LayoutDashboard, "Overview", "/dashboard"],
       [Store, "Restaurants", "/restaurants"],
@@ -174,7 +175,7 @@ export default function DashboardLayout() {
               </button>
               {menu && (
                 <div className="profile-dropdown">
-                  {user.role === ROLES.RESTAURANT && <button onClick={() => { setMenu(false); nav('/my-profile'); }}><UserRound size={17} /> My Profile</button>}
+                  {[ROLES.RESTAURANT,ROLES.BRANCH].includes(user.role) && <button onClick={() => { setMenu(false); nav('/my-profile'); }}><UserRound size={17} /> My Profile</button>}
                   <button onClick={signOut} className="danger">
                     <LogOut size={17} /> Sign out
                   </button>

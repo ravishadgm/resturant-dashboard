@@ -39,7 +39,17 @@ const getRestaurantDashboard = () => {
   return restaurantDashboardRequest;
 };
 
+const branchRequests = new Map();
+const getBranchDashboard = () => {
+  const token = storage.get(STORAGE_KEYS.authToken);
+  if (!branchRequests.has(token)) {
+    branchRequests.set(token, apiClient.get('/api/v1/branch/dashboard').finally(() => branchRequests.delete(token)));
+  }
+  return branchRequests.get(token);
+};
+
 export const dashboardApi = {
+  getBranchDashboard,
   getAdminDashboard,
   getRestaurantDashboard,
 };
