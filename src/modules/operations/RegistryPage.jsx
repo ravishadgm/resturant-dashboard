@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Eye, Pencil, Plus } from 'lucide-react';
+import { Clock3, Eye, Pencil, Plus } from 'lucide-react';
 import MapLink from '../../components/common/MapLink';
+import BranchSchedule from './BranchSchedule';
 import CommonTable from '../../components/common/CommonTable';
 import ServerTable from '../../components/common/ServerTable';
 import EntityForm from '../../components/common/EntityForm';
@@ -49,11 +50,9 @@ const branchListFields=[
   {name:'notify_lead_minutes',label:'Notify lead (minutes)'},
   {name:'rating',label:'Rating'},
   {name:'map_url',label:'Map URL'},
-  {name:'created_at',label:'Created at'},
-  {name:'updated_at',label:'Updated at'},
   {name:'restaurant_name',label:'Restaurant'},
-  {name:'restaurant_phone',label:'Restaurant phone'},
-  {name:'restaurant_email',label:'Restaurant email'}
+  {name:'created_at',label:'Created at'},
+  {name:'updated_at',label:'Updated at'}
 ];
 const branchDetailFields=[
   ...branchListFields.filter(field=>!['created_at','updated_at'].includes(field.name)&&!field.name.startsWith('restaurant_')),
@@ -214,6 +213,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const branchScope=user.role===ROLES.RESTAURANT?'restaurant':'admin';
   const loggedInRestaurantId=String(user.restaurant_id||user.restaurant?.restaurant_id||user.user_id||'');
   const [rows,setRows]=useState([]); const [loading,setLoading]=useState(true); const [mode,setMode]=useState(null); const [active,setActive]=useState(null); const [saving,setSaving]=useState(false); const [formError,setFormError]=useState(''); const [restaurantTotal,setRestaurantTotal]=useState(0); const [branchTotal,setBranchTotal]=useState(0); const [managerTotal,setManagerTotal]=useState(0); const [customerTotal,setCustomerTotal]=useState(0); const [tableTotal,setTableTotal]=useState(0); const [restaurantOptions,setRestaurantOptions]=useState([]); const [branchOptions,setBranchOptions]=useState([]); const [managerBranchId,setManagerBranchId]=useState(''); const [tableBranchId,setTableBranchId]=useState('');
+  const [scheduleBranch,setScheduleBranch]=useState(null);
   const lastQueryRef=useRef({page:1,limit:10,search:''});
   const load=async(params={page:1,limit:10,search:''},selectedManagerBranchId=managerBranchId,selectedTableBranchId=tableBranchId)=>{
     lastQueryRef.current=params;
@@ -356,7 +356,10 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const dataColumns=displayFields.map(field=>({key:field.name,label:field.label,render:value=>renderRegistryValue(field,value)}));
   const actionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="View" onClick={()=>{setActive(row);setMode('view')}}><Eye/></button>{!readOnly&&<button title="Edit" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button>}</div>};
   const customerActionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="Update status" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button></div>};
-  const columns=['managers','tables'].includes(kind)?dataColumns:kind==='customers'?[...dataColumns,customerActionColumn]:[...dataColumns,actionColumn];
+  const timingColumn={key:'timings',label:'Schedules',sortable:false,render:(_,row)=><button type="button" className="branch-timing-button" onClick={()=>setScheduleBranch(row)} aria-label={`Weekly schedules for ${row.name}`}><Clock3 size={16}/> Schedules</button>};
+  const branchDateColumns=dataColumns.filter(column=>['created_at','updated_at'].includes(column.key));
+  const branchInfoColumns=dataColumns.filter(column=>!['created_at','updated_at'].includes(column.key));
+  const columns=kind==='branches'?[...branchInfoColumns,...(branchScope==='restaurant'?[timingColumn]:[]),actionColumn,...branchDateColumns]:['managers','tables'].includes(kind)?dataColumns:kind==='customers'?[...dataColumns,customerActionColumn]:[...dataColumns,actionColumn];
   const visibleRows=user.role===ROLES.MANAGER&&kind==='tables'?rows.filter(row=>String(row.branch_id)===String(user.branch_id)):rows;
   const canAdd=!readOnly&&kind!=='customers'&&(kind!=='managers'||branchScope==='restaurant');
   const changeManagerBranch=event=>{const nextBranch=event.target.value;setManagerBranchId(nextBranch);load({page:1,limit:10,search:''},nextBranch)};
@@ -364,6 +367,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const changeTableBranch=event=>{const nextBranch=event.target.value;setTableBranchId(nextBranch);load({page:1,limit:10,search:''},managerBranchId,nextBranch)};
   const tableBranchFilter=kind==='tables'&&branchScope==='restaurant'?<div className="table-card queue-branch-filter"><label className="field"><span>Branch</span><select value={tableBranchId} onChange={changeTableBranch} disabled={loading}>{branchOptions.length?branchOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>):<option value="">No branches available</option>}</select></label></div>:null;
   return <><PageHeader eyebrow="OPERATIONS" title={title||config.title} description={description||config.description} action={canAdd&&<button className="btn primary" onClick={()=>{setActive(null);setMode('add')}}><Plus size={17}/> Add {config.singular}</button>}/>{managerBranchFilter}{tableBranchFilter}{kind==='restaurants'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={restaurantTotal} onQueryChange={load} searchPlaceholder="Search restaurants"/>:kind==='branches'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={branchTotal} onQueryChange={load} searchPlaceholder="Search branches" minWidth={3000}/>:kind==='managers'?<ServerTable key={branchScope==='restaurant'?managerBranchId:'admin-managers'} columns={columns} data={visibleRows} loading={loading} total={managerTotal} onQueryChange={params=>load(params,managerBranchId)} searchPlaceholder="Search managers" minWidth={1500}/>:kind==='customers'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={customerTotal} onQueryChange={load} searchPlaceholder="Search customers" minWidth={1200}/>:kind==='tables'?<ServerTable key={branchScope==='restaurant'?tableBranchId:'admin-tables'} columns={columns} data={visibleRows} loading={loading} total={tableTotal} onQueryChange={params=>load(params,managerBranchId,tableBranchId)} searchPlaceholder="Search tables" minWidth={user.role===ROLES.SUPER_ADMIN?3600:900}/>:<CommonTable columns={columns} data={visibleRows} loading={loading} searchPlaceholder={`Search ${config.title.toLowerCase()}…`}/>}
+    {scheduleBranch && <BranchSchedule key={scheduleBranch.branch_id??scheduleBranch.id} branch={scheduleBranch} onClose={()=>setScheduleBranch(null)}/>}
     <Modal open={mode==='add'||mode==='edit'} title={`${mode==='edit'?'Edit':'Add'} ${config.singular}`} onClose={()=>{if(!saving)setMode(null)}} size="wide"><EntityForm initial={formInitial} fields={formFields} onCancel={()=>setMode(null)} onSubmit={save} onFormChange={()=>setFormError('')} submitLabel={mode==='edit'?'Save changes':`Add ${config.singular}`} busy={saving} formError={formError}/></Modal>
     <Modal open={mode==='view'} title={`${config.singular} details`} onClose={()=>setMode(null)} size="wide"><div className="registry-detail">{detailFields.map(field=><div key={field.name}><span>{field.label}</span><strong>{renderRegistryValue(field,active?.[field.name])}</strong></div>)}<div><span>Created at</span><strong>{active?.createdAt?new Date(active.createdAt).toLocaleString():'—'}</strong></div><div><span>Updated at</span><strong>{active?.updatedAt?new Date(active.updatedAt).toLocaleString():'—'}</strong></div></div><footer className="modal-actions"><button className="btn secondary" onClick={()=>setMode(null)}>Close</button>{!readOnly&&<button className="btn primary" onClick={()=>setMode('edit')}><Pencil size={16}/> Edit</button>}</footer></Modal>
   </>;
