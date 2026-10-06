@@ -150,6 +150,7 @@ export const registryConfigs = {
 };
 
 const pretty=value=>value===undefined||value===null||value===''?'—':String(value);
+
 const mediaUrl=value=>!value?'':/^https?:\/\//i.test(value)?value:`${API_BASE_URL}${value.startsWith('/')?'':'/'}${value}`;
 const renderRegistryValue=(field,value)=>{
   if(field.name==='map_url'||field.source==='map_url')return <MapLink value={value}/>;
