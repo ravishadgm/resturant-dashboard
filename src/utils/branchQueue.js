@@ -1,0 +1,18 @@
+export const normalizeBranchQueue = row => ({
+  id: row.queue_id,
+  queue_number: row.queue_number,
+  business_date: row.business_date,
+  restaurant_name: row.restaurant_name,
+  branch_name: row.branch_name,
+  city: row.city,
+  customer_name: row.customer_name ?? row.customer?.name ?? '',
+  customer_phone: row.customer?.phone ?? '',
+  customer_email: row.customer?.email ?? '',
+  member_count: row.member_count,
+  requirements: row.requirements,
+  status: row.status,
+  customer_status: row.customer?.status ?? '',
+  customer_address: row.customer?.address ?? '',
+  customer_latitude: row.customer?.latitude ?? '',
+  customer_longitude: row.customer?.longitude ?? '',
+});

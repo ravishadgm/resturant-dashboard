@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ChevronsUpDown, Search } from 'lucide-react';
 
-export default function ServerTable({ columns, data, loading, total = 0, onQueryChange, searchPlaceholder = 'Search records…', minWidth }) {
+export default function ServerTable({ columns, data, loading, total = 0, onQueryChange, searchPlaceholder = 'Search records…', minWidth, showSearch = true }) {
   const [query, setQuery] = useState('');
   const [activeSearch, setActiveSearch] = useState('');
   const [sort, setSort] = useState({ key: 'name', dir: 'asc' });
@@ -42,7 +42,7 @@ export default function ServerTable({ columns, data, loading, total = 0, onQuery
 
   return (
     <div className="table-card">
-      <div className="table-tools server-table-tools">
+      {showSearch && <div className="table-tools server-table-tools">
         <form className="table-search-form" onSubmit={submitSearch}>
           <label className="search-box">
             <Search size={18} />
@@ -50,7 +50,7 @@ export default function ServerTable({ columns, data, loading, total = 0, onQuery
           </label>
           <button className="btn primary table-search-button" disabled={loading}>Search</button>
         </form>
-      </div>
+      </div>}
       <div className="table-scroll">
         <table className="server-data-table" style={minWidth ? { minWidth } : undefined}>
           <thead>

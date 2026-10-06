@@ -44,7 +44,7 @@ export default function DashboardLayout() {
     };
   }, [mobile]);
   const roleLinks = {
-    [ROLES.BRANCH]: [[LayoutDashboard, "Overview", "/dashboard"], [UserRound, "My Profile", "/my-profile"], [CalendarDays, "Schedules", "/schedules"]],
+    [ROLES.BRANCH]: [[LayoutDashboard, "Overview", "/dashboard"], [UserRound, "My Profile", "/my-profile"], [CalendarDays, "Schedules", "/schedules"], [Armchair, "Table", "/tables"], [Users, "Customer", "/customers"], [ListOrdered, "Queue", "/queue"]],
     [ROLES.SUPER_ADMIN]: [
       [LayoutDashboard, "Overview", "/dashboard"],
       [Store, "Restaurants", "/restaurants"],
