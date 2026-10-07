@@ -1,0 +1,304 @@
+{
+  "success": true,
+  "from": "2026-09-08",
+  "to": "2026-10-07",
+  "timezone": "Asia/Kolkata",
+  "series": [
+    {
+      "key": "tables",
+      "label": "Tables",
+      "color": "#6d45d8",
+      "metric": "records_created"
+    },
+    {
+      "key": "customers",
+      "label": "Customers",
+      "color": "#3478d4",
+      "metric": "records_created"
+    },
+    {
+      "key": "queue",
+      "label": "Queue",
+      "color": "#268b60",
+      "metric": "entries_created"
+    },
+    {
+      "key": "schedules",
+      "label": "Schedules",
+      "color": "#df921d",
+      "metric": "days_updated"
+    }
+  ],
+  "data": [
+    {
+      "date": "2026-09-08",
+      "counts": {
+        "tables": 2,
+        "customers": 4,
+        "queue": 8,
+        "schedules": 2
+      }
+    },
+    {
+      "date": "2026-09-09",
+      "counts": {
+        "tables": 5,
+        "customers": 9,
+        "queue": 15,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-10",
+      "counts": {
+        "tables": 1,
+        "customers": 14,
+        "queue": 22,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-11",
+      "counts": {
+        "tables": 4,
+        "customers": 2,
+        "queue": 4,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-12",
+      "counts": {
+        "tables": 0,
+        "customers": 7,
+        "queue": 11,
+        "schedules": 2
+      }
+    },
+    {
+      "date": "2026-09-13",
+      "counts": {
+        "tables": 3,
+        "customers": 12,
+        "queue": 18,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-14",
+      "counts": {
+        "tables": 6,
+        "customers": 0,
+        "queue": 0,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-15",
+      "counts": {
+        "tables": 2,
+        "customers": 5,
+        "queue": 7,
+        "schedules": 1
+      }
+    },
+    {
+      "date": "2026-09-16",
+      "counts": {
+        "tables": 5,
+        "customers": 10,
+        "queue": 14,
+        "schedules": 2
+      }
+    },
+    {
+      "date": "2026-09-17",
+      "counts": {
+        "tables": 1,
+        "customers": 15,
+        "queue": 21,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-18",
+      "counts": {
+        "tables": 4,
+        "customers": 3,
+        "queue": 3,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-19",
+      "counts": {
+        "tables": 0,
+        "customers": 8,
+        "queue": 10,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-20",
+      "counts": {
+        "tables": 3,
+        "customers": 13,
+        "queue": 17,
+        "schedules": 2
+      }
+    },
+    {
+      "date": "2026-09-21",
+      "counts": {
+        "tables": 6,
+        "customers": 1,
+        "queue": 24,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-22",
+      "counts": {
+        "tables": 2,
+        "customers": 6,
+        "queue": 6,
+        "schedules": 1
+      }
+    },
+    {
+      "date": "2026-09-23",
+      "counts": {
+        "tables": 5,
+        "customers": 11,
+        "queue": 13,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-24",
+      "counts": {
+        "tables": 1,
+        "customers": 16,
+        "queue": 20,
+        "schedules": 2
+      }
+    },
+    {
+      "date": "2026-09-25",
+      "counts": {
+        "tables": 4,
+        "customers": 4,
+        "queue": 2,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-26",
+      "counts": {
+        "tables": 0,
+        "customers": 9,
+        "queue": 9,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-27",
+      "counts": {
+        "tables": 3,
+        "customers": 14,
+        "queue": 16,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-09-28",
+      "counts": {
+        "tables": 6,
+        "customers": 2,
+        "queue": 23,
+        "schedules": 2
+      }
+    },
+    {
+      "date": "2026-09-29",
+      "counts": {
+        "tables": 2,
+        "customers": 7,
+        "queue": 5,
+        "schedules": 1
+      }
+    },
+    {
+      "date": "2026-09-30",
+      "counts": {
+        "tables": 5,
+        "customers": 12,
+        "queue": 12,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-10-01",
+      "counts": {
+        "tables": 1,
+        "customers": 0,
+        "queue": 19,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-10-02",
+      "counts": {
+        "tables": 4,
+        "customers": 5,
+        "queue": 1,
+        "schedules": 2
+      }
+    },
+    {
+      "date": "2026-10-03",
+      "counts": {
+        "tables": 0,
+        "customers": 10,
+        "queue": 8,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-10-04",
+      "counts": {
+        "tables": 3,
+        "customers": 15,
+        "queue": 15,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-10-05",
+      "counts": {
+        "tables": 6,
+        "customers": 3,
+        "queue": 22,
+        "schedules": 0
+      }
+    },
+    {
+      "date": "2026-10-06",
+      "counts": {
+        "tables": 2,
+        "customers": 8,
+        "queue": 4,
+        "schedules": 2
+      }
+    },
+    {
+      "date": "2026-10-07",
+      "counts": {
+        "tables": 5,
+        "customers": 13,
+        "queue": 11,
+        "schedules": 0
+      }
+    }
+  ]
+}

@@ -67,3 +67,30 @@ html,body,#root{width:100%;max-width:100%;overflow-x:hidden}.app-main,.page-cont
 .branch-schedules-summary{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;margin-bottom:20px}.branch-schedules-today,.branch-schedules-count{display:flex;align-items:center;gap:18px;padding:24px}.branch-schedules-summary svg{color:var(--purple);flex:none}.branch-schedules-today small{font-size:10px;font-weight:800;color:var(--purple)}.branch-schedules-today h2{font-size:24px;margin:7px 0}.branch-schedules-summary p{margin:4px 0;font-size:13px;color:var(--muted)}.branch-schedules-count strong{font-size:28px}.branch-schedules-count small{font-size:12px;color:var(--muted)}.branch-schedule-scroll{overflow-x:auto}.branch-weekly-schedule table{min-width:550px}.branch-schedule-day-label{text-transform:capitalize;color:var(--ink)}.branch-schedule-today-tag{display:inline-block;font-size:10px;margin-left:10px;padding:3px 7px;border-radius:5px;background:#eee7ff;color:var(--purple)}.branch-schedule-today-row{background:#faf7ff}@media(max-width:680px){.branch-schedules-summary{grid-template-columns:1fr}.branch-schedules-today,.branch-schedules-count{padding:18px}.branch-weekly-schedule table{min-width:430px}.branch-weekly-schedule td,.branch-weekly-schedule th{padding:0 12px}.branch-schedules-today h2{font-size:21px}}
 
 .schedule-time-input{width:140px;max-width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--ink)}.schedule-time-input:disabled{background:#f5f4f8;color:#aaa}.schedule-time-input:focus{outline:2px solid var(--purple);outline-offset:1px}.branch-schedule-save-note{font-size:12px;color:var(--muted);margin:15px 20px}.branch-weekly-schedule .modal-actions{position:static}.branch-weekly-schedule .schedule-closed input{accent-color:var(--purple)}
+
+/* Daily module activity graph */
+.overview-graph{margin:24px 0;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:14px;min-width:0}
+.overview-graph-header{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.overview-graph-header h2{display:flex;align-items:center;gap:8px;font-size:18px;margin-bottom:8px}
+.overview-graph-header p,.overview-range{font-size:12px;color:var(--muted)}
+.overview-sample-label{display:inline-block;padding:4px 8px;border-radius:6px;background:#f3effd;color:var(--purple);font-size:11px}
+.overview-date-filters{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.overview-date-filters .field{display:grid;gap:7px;font-size:12px;flex:1}
+.overview-date-filters input{height:42px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--ink)}
+.overview-chart-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:26px 0 12px;padding-top:20px;border-top:1px solid var(--border)}
+.overview-chart-legend{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.overview-chart-legend span{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#494656}
+.overview-chart-legend i{display:inline-block;width:11px;height:11px;border-radius:3px}
+.overview-range{margin:0}
+.overview-chart-scroll,.overview-data-scroll{overflow-x:auto;max-width:100%}
+.overview-chart-scroll{width:100%;margin-bottom:16px}
+.overview-chart{display:block}
+.overview-bar rect{transition:opacity .15s}
+.overview-bar:hover rect{opacity:1;filter:brightness(1.08)}
+.overview-data-details{border-top:1px solid var(--border);padding-top:14px;font-size:12px}
+.overview-data-details summary{cursor:pointer;color:var(--purple);font-weight:700}
+.overview-data-details table{border-collapse:collapse;width:100%;margin-top:12px;min-width:500px}
+.overview-data-details caption{text-align:left;padding:10px;color:var(--muted)}
+.overview-data-details th,.overview-data-details td{padding:10px;text-align:left;border-bottom:1px solid var(--border)}
+.overview-graph-message{padding:24px 0;color:var(--muted);font-size:13px}
+@media(max-width:680px){.overview-graph{padding:16px}.overview-date-filters{width:100%}.overview-date-filters .field{min-width:130px}.overview-graph-header{gap:16px}.overview-chart-legend{gap:12px 18px}.overview-chart-meta{margin-top:20px}}
