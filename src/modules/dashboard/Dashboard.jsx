@@ -1,3 +1,4 @@
+import OverviewGraph from './OverviewGraph';
 import { useEffect, useState } from 'react';
 import { Armchair, Building2, ListOrdered, MapPin, Store, UserRound, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -103,6 +104,7 @@ export default function Dashboard() {
           </article>
         ))}
       </div>
+      {isRestaurant && <OverviewGraph />}
     </>
   );
 }

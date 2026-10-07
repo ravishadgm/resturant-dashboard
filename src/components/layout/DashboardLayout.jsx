@@ -54,11 +54,11 @@ export default function DashboardLayout() {
       [History, "Complete history", "/history"],
     ],
     [ROLES.RESTAURANT]: [
-      [UserRound, "My Profile", "/my-profile"],
       [LayoutDashboard, "Overview", "/dashboard"],
       [Building2, "Branches", "/branches"],
       [Users, "Managers", "/managers"],
       [Armchair, "Tables", "/tables"],
+      [UserRound, "My Profile", "/my-profile"],
     ],
     [ROLES.MANAGER]: [
       [LayoutDashboard, "Overview", "/dashboard"],
