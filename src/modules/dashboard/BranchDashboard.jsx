@@ -1,49 +1,63 @@
-import OverviewGraph from './OverviewGraph';
-import { useEffect, useState } from 'react';
-import { Armchair, CalendarDays, Clock3, ListOrdered, RefreshCw, Users, Utensils } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { dashboardApi } from '../../api/dashboardApi';
+import { useState } from 'react';
+import { ArrowDown, ArrowUp, CalendarDays, Clock3, ListOrdered, Timer, Users, XCircle } from 'lucide-react';
+import response from '../../services/branchDashboardResponse.json';
+import { customerSeries, getBranchPeriod } from '../../utils/branchDashboard';
+import { DailyCustomerChart, DistributionChart } from './BranchDashboardCharts';
 
-const count = value => value == null ? '-' : Number.isFinite(Number(value)) ? Number(value) : '-';
 export default function BranchDashboard() {
-  const {user} = useAuth();
-  const [data,setData] = useState(null);
-  const [loading,setLoading] = useState(true);
-  const [error,setError] = useState('');
-  const [refresh,setRefresh] = useState(0);
-  useEffect(() => {
-    let active = true;
-    setLoading(true); setError('');
-    dashboardApi.getBranchDashboard().then(response => {
-      if (!active) return;
-      if (response?.success === false) throw new Error(response.message || 'Unable to load dashboard.');
-      const details = response?.data ?? response;
-      if (!details || typeof details !== 'object' || !details.queue) throw new Error('The server returned an invalid dashboard.');
-      setData(details);
-    }).catch(err => { if (active) setError(err.message); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  },[refresh]);
-  const queue = data?.queue;
-  const timing = data?.today_timing;
+  const [from, setFrom] = useState(response.from);
+  const [to, setTo] = useState(response.to);
+  const { branch, tables, queue, summary } = response.data;
+  const invalid = !from || !to || from > to;
+  const { daily, counts, total } = getBranchPeriod(response, from, to);
+  const fullPeriod = from === response.from && to === response.to;
   const stats = [
-    [Armchair,'Tables',data?.tables,'Total branch tables','violet'],
-    [Users,'Customers',data?.customers,'Branch customers','blue'],
-    [ListOrdered,'Waiting',queue?.waiting_count,'Waiting today','violet'],
-    [Utensils,'Dining',queue?.dining_count,'Currently dining','green'],
-    [ListOrdered,'Total in queue',queue?.total_in_queue,'Today?s queue','blue'],
-    [Armchair,'Free tables',queue?.free_tables,'Available tables','green'],
-    [Armchair,'Occupied tables',queue?.occupied_tables,'Tables in use','violet'],
-    [CalendarDays,'Weekly schedule',data?.weekly_timing_set,'Days configured out of 7','blue'],
+    [Users, 'Total Customers', total, 'total', 'blue'],
+    [ListOrdered, 'Walk-ins (Queue)', counts.walk_in, 'walk_in', 'blue'],
+    [CalendarDays, 'Scheduled', counts.scheduled, 'scheduled', 'green'],
+    [XCircle, 'Cancelled', counts.cancelled, 'cancelled', 'red'],
   ];
-  return <>
-    <div className="dashboard-welcome"><div><span>BRANCH OVERVIEW</span><h1>{data?.branch_name || data?.name || user.name}</h1><p>{data?.restaurant_name || 'Your branch workspace'}{queue?.business_date ? ` ? Business date: ${queue.business_date}` : ''}</p></div><button className="btn secondary" disabled={loading} onClick={()=>setRefresh(value=>value+1)}><RefreshCw size={16}/>{loading?'Loading...':'Refresh'}</button></div>
-    {error && <div className="profile-error" role="alert">{error}<button className="btn secondary" disabled={loading} onClick={()=>setRefresh(value=>value+1)}>Try again</button></div>}
-    <div className="stats-grid four-columns" aria-busy={loading}>{stats.map(([Icon,label,value,hint,color])=><article className="stat-card" key={label}><div className={`stat-icon ${color}`}><Icon/></div><span>{label}</span><strong>{loading?'-':count(value)}</strong><small>{hint}</small></article>)}</div>
-    <OverviewGraph />
-    <div className="branch-dashboard-panels">
-      <section className="panel"><header><span><Clock3/></span><div><h2>Today?s opening hours</h2><p>{timing?.day_of_week?.toLowerCase() || 'Today'}</p></div></header><div className="branch-dashboard-body"><strong>{loading?'Loading...':!timing || timing.is_set===false?'Schedule not set':timing.is_closed?'Closed today':`${timing.open_time || '-'} ? ${timing.close_time || '-'}`}</strong><p>Queue: {data?.queue_enabled===true?'Enabled':data?.queue_enabled===false?'Disabled':'-'}</p>{data?.address && <p>{data.address}</p>}</div></section>
-      <section className="panel"><header><div><h2>Today?s queue status</h2><p>Queue entries by status</p></div></header><div className="branch-dashboard-status">{['WAITING','CALLED','SEATED','COMPLETED'].map(status=><div key={status}><span className={`registry-status ${status.toLowerCase()}`}>{status.charAt(0)+status.slice(1).toLowerCase()}</span><strong>{loading?'-':count(queue?.status_breakdown?.[status])}</strong></div>)}</div></section>
+  const tableSegments = [
+    { key: 'available', label: 'Available', value: tables.available, color: '#10b981' },
+    { key: 'occupied', label: 'Occupied', value: tables.occupied, color: '#2186eb' },
+    { key: 'reserved', label: 'Reserved', value: tables.reserved, color: '#f5a623' },
+  ];
+  return <div className="reference-dashboard">
+    <header className="reference-dashboard-header">
+      <div><span className="reference-eyebrow">BRANCH DASHBOARD</span><h1>{branch.branch_name}</h1><p>{branch.restaurant_name} · Single branch overview</p></div>
+      <div className="overview-date-filters">
+        <label className="field">From date<input type="date" value={from} onChange={event => setFrom(event.target.value)} /></label>
+        <label className="field">To date<input type="date" value={to} onChange={event => setTo(event.target.value)} /></label>
+        <button className="btn secondary" onClick={() => { setFrom(response.from); setTo(response.to); }}>Reset</button>
+      </div>
+    </header>
+    {invalid ? <p className="profile-error" role="alert">Select both dates. From date must be on or before To date.</p> : <>
+      <div className="reference-summary-grid" aria-live="polite">
+        {stats.map(([Icon, label, value, key, color]) => {
+          const growth = summary.growth[key];
+          return <article className="reference-summary-card" key={key}>
+            <div className="reference-summary-label"><span className={'reference-stat-icon ' + color}><Icon size={18} /></span>{label}</div>
+            <strong>{value.toLocaleString('en-IN')}</strong>
+            {fullPeriod ? <><span className={'reference-growth ' + (growth >= 0 ? 'positive' : 'negative')}>{growth >= 0 ? <ArrowUp size={13} /> : <ArrowDown size={13} />}{Math.abs(growth)}%</span><small>vs previous period</small></> : <small>In selected date range</small>}
+          </article>;
+        })}
+      </div>
+      <div className="reference-customer-grid">
+        <section className="reference-card"><h2>Customer Distribution</h2>
+          {total ? <DistributionChart key={from + to} segments={customerSeries.map(item => ({ ...item, value: counts[item.key] }))} total={total} centerLabel="Total" /> :
+          <p className="reference-empty">No customer records in this date range. Sample dates: {response.from} to {response.to}.</p>}
+        </section>
+        <section className="reference-card"><h2>Daily Customer Count</h2><DailyCustomerChart key={from + to} rows={daily} series={customerSeries} /></section>
+      </div>
+    </>}
+    <div className="reference-current-grid">
+      <section className="reference-card"><h2>Table Status <small>(Current)</small></h2><DistributionChart segments={tableSegments} total={tables.total} centerLabel="Tables" /></section>
+      <section className="reference-card"><h2>Today's Queue Status</h2><p className="reference-current-note">Current snapshot, independent of the selected dates.</p>
+        <div className="reference-queue-list">
+          {[[Users, 'Current Waiting', queue.current_waiting + ' Groups', 'red'], [Clock3, 'Avg. Waiting Time', queue.avg_waiting_minutes + ' Minutes', 'red'], [Timer, 'Next Table In', '~ ' + queue.next_table_in_minutes + ' Minutes', 'violet']].map(([Icon, label, value, color]) =>
+            <div key={label}><span className={'reference-stat-icon ' + color}><Icon size={21} /></span><div><span>{label}</span><strong>{value}</strong></div></div>)}
+        </div>
+      </section>
     </div>
-  </>;
+  </div>;
 }
