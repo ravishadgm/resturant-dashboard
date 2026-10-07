@@ -296,6 +296,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
         if(kind==='managers'){
           const initialBranch=options[0]?.value||'';
           setManagerBranchId(initialBranch);
+          
           load({page:1,limit:10,search:''},initialBranch);
         }else if(kind==='tables'&&branchScope==='restaurant'){
           const initialBranch=options[0]?.value||'';
