@@ -35,8 +35,10 @@ export const tableApi = {
 
     return listRequests.get(requestKey);
   },
-  create: (details, scope = 'admin') => {
-    const path = scope === 'restaurant' ? '/api/v1/restaurant/tables' : '/api/v1/admin/tables';
-    return apiClient.post(path, createPayload(details)).then(clearListRequests);
+  create: (details, scope) => {
+    if (scope !== 'restaurant') {
+      return Promise.reject(new Error('Table creation is available only in the restaurant portal.'));
+    }
+    return apiClient.post('/api/v1/restaurant/tables', createPayload(details)).then(clearListRequests);
   },
 };

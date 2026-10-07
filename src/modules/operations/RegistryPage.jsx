@@ -356,6 +356,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
         await refreshAfterSave('Customer status updated');return;
       }
       if(kind==='tables'&&mode==='add'){
+        if(branchScope!=='restaurant')throw new Error('Table creation is available only in the restaurant portal.');
         await tableApi.create(values,branchScope);
         await refreshAfterSave('Table created');return;
       }
@@ -388,7 +389,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const customerActionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="Update status" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button></div>};
   const columns=['managers','tables'].includes(kind)?dataColumns:kind==='customers'?[...dataColumns,customerActionColumn]:[...dataColumns,actionColumn];
   const visibleRows=user.role===ROLES.MANAGER&&kind==='tables'?rows.filter(row=>String(row.branch_id)===String(user.branch_id)):rows;
-  const canAdd=!readOnly&&kind!=='customers'&&(kind!=='managers'||branchScope==='restaurant');
+  const canAdd=!readOnly&&kind!=='customers'&&(kind!=='managers'||branchScope==='restaurant')&&(kind!=='tables'||branchScope==='restaurant');
   const changeManagerBranch=event=>{const nextBranch=event.target.value;setManagerBranchId(nextBranch);load({page:1,limit:10,search:''},nextBranch)};
   const managerBranchFilter=kind==='managers'&&branchScope==='restaurant'?<div className="table-card queue-branch-filter"><label className="field"><span>Branch</span><select value={managerBranchId} onChange={changeManagerBranch} disabled={loading}>{branchOptions.length?branchOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>):<option value="">No branches available</option>}</select></label></div>:null;
   const changeTableBranch=event=>{const nextBranch=event.target.value;setTableBranchId(nextBranch);load({page:1,limit:10,search:''},managerBranchId,nextBranch)};
