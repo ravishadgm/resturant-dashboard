@@ -1,3 +1,4 @@
+import RestaurantDashboard from '../modules/dashboard/RestaurantDashboard';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { PORTAL, PORTAL_ROLE } from '../utils/portal';
@@ -15,7 +16,7 @@ export default function AppRoutes() {
   return <Routes>
     <Route path="/login" element={signedIn ? <Navigate to="/dashboard" replace/> : <Login/>}/>
     <Route element={<ProtectedRoute/>}><Route element={<DashboardLayout/>}>
-      <Route path="/dashboard" element={<Dashboard/>}/>
+      <Route path="/dashboard" element={PORTAL === 'restaurant' ? <RestaurantDashboard/> : <Dashboard/>}/>
       <Route path="/branches" element={<RegistryPage kind="branches"/>}/>
       <Route path="/managers" element={<RegistryPage kind="managers"/>}/>
       <Route path="/tables" element={<RegistryPage kind="tables"/>}/>

@@ -1,0 +1,1028 @@
+{
+    "success":  true,
+    "message":  "Restaurant dashboard",
+    "from":  "2025-09-01",
+    "to":  "2025-09-30",
+    "timezone":  "Asia/Kolkata",
+    "data":  {
+                 "restaurant":  {
+                                    "restaurant_id":  2,
+                                    "restaurant_name":  "Spice Hub"
+                                },
+                 "summary":  {
+                                 "total_customers":  640,
+                                 "walk_in_count":  480,
+                                 "scheduled_count":  140,
+                                 "cancelled_count":  20,
+                                 "walk_in_percent":  75,
+                                 "scheduled_percent":  21.875,
+                                 "cancelled_percent":  3.125,
+                                 "growth":  {
+                                                "total":  18,
+                                                "walk_in":  12,
+                                                "scheduled":  40,
+                                                "cancelled":  -10
+                                            }
+                             },
+                 "daily":  [
+                               {
+                                   "date":  "2025-09-01",
+                                   "walk_in":  13,
+                                   "scheduled":  3,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  2,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-02",
+                                   "walk_in":  19,
+                                   "scheduled":  7,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  6,
+                                                        "scheduled":  3,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  8,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-03",
+                                   "walk_in":  15,
+                                   "scheduled":  4,
+                                   "cancelled":  3,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  5,
+                                                        "scheduled":  1,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  5,
+                                                        "scheduled":  2,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  1,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-04",
+                                   "walk_in":  20,
+                                   "scheduled":  6,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  9,
+                                                        "scheduled":  3,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-05",
+                                   "walk_in":  16,
+                                   "scheduled":  5,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  6,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  7,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  1,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-06",
+                                   "walk_in":  14,
+                                   "scheduled":  4,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  5,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  5,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  1,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-07",
+                                   "walk_in":  17,
+                                   "scheduled":  5,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  8,
+                                                        "scheduled":  3,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  2,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-08",
+                                   "walk_in":  14,
+                                   "scheduled":  3,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  6,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  6,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  1,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  1,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-09",
+                                   "walk_in":  15,
+                                   "scheduled":  5,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  5,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-10",
+                                   "walk_in":  15,
+                                   "scheduled":  3,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  8,
+                                                        "scheduled":  2,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  1,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  3,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-11",
+                                   "walk_in":  18,
+                                   "scheduled":  7,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  4,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  6,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  6,
+                                                        "scheduled":  2,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-12",
+                                   "walk_in":  13,
+                                   "scheduled":  2,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  2,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  4,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-13",
+                                   "walk_in":  18,
+                                   "scheduled":  7,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  6,
+                                                        "scheduled":  3,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  7,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-14",
+                                   "walk_in":  17,
+                                   "scheduled":  5,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  6,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  6,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  1,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-15",
+                                   "walk_in":  18,
+                                   "scheduled":  5,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  9,
+                                                        "scheduled":  3,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  2,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-16",
+                                   "walk_in":  18,
+                                   "scheduled":  5,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  6,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  8,
+                                                        "scheduled":  2,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  2,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-17",
+                                   "walk_in":  13,
+                                   "scheduled":  4,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  5,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  1,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-18",
+                                   "walk_in":  16,
+                                   "scheduled":  5,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  9,
+                                                        "scheduled":  2,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-19",
+                                   "walk_in":  15,
+                                   "scheduled":  3,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  5,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  7,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  1,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  2,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-20",
+                                   "walk_in":  16,
+                                   "scheduled":  4,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  5,
+                                                        "scheduled":  1,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  5,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-21",
+                                   "walk_in":  14,
+                                   "scheduled":  5,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  8,
+                                                        "scheduled":  2,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  1,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-22",
+                                   "walk_in":  18,
+                                   "scheduled":  6,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  4,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  6,
+                                                        "scheduled":  1,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  6,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-23",
+                                   "walk_in":  13,
+                                   "scheduled":  3,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  2,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-24",
+                                   "walk_in":  19,
+                                   "scheduled":  5,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  7,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  8,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  2,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-25",
+                                   "walk_in":  15,
+                                   "scheduled":  6,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  3,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  5,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  5,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  2,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-26",
+                                   "walk_in":  19,
+                                   "scheduled":  6,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  9,
+                                                        "scheduled":  3,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-27",
+                                   "walk_in":  17,
+                                   "scheduled":  4,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  6,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  7,
+                                                        "scheduled":  2,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  1,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  3,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-28",
+                                   "walk_in":  13,
+                                   "scheduled":  5,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  4,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  5,
+                                                        "scheduled":  2,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  1,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-29",
+                                   "walk_in":  17,
+                                   "scheduled":  3,
+                                   "cancelled":  1,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  9,
+                                                        "scheduled":  2,
+                                                        "cancelled":  1
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  2,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  3,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  3,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               },
+                               {
+                                   "date":  "2025-09-30",
+                                   "walk_in":  15,
+                                   "scheduled":  5,
+                                   "cancelled":  0,
+                                   "branches":  [
+                                                    {
+                                                        "branch_id":  4,
+                                                        "walk_in":  5,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  5,
+                                                        "walk_in":  7,
+                                                        "scheduled":  2,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  6,
+                                                        "walk_in":  1,
+                                                        "scheduled":  1,
+                                                        "cancelled":  0
+                                                    },
+                                                    {
+                                                        "branch_id":  7,
+                                                        "walk_in":  2,
+                                                        "scheduled":  0,
+                                                        "cancelled":  0
+                                                    }
+                                                ]
+                               }
+                           ],
+                 "branches":  [
+                                  {
+                                      "branch_id":  4,
+                                      "branch_name":  "Ring Road Branch",
+                                      "customers":  220,
+                                      "walk_in_count":  160,
+                                      "scheduled_count":  52,
+                                      "cancelled_count":  8,
+                                      "conversion":  96.4
+                                  },
+                                  {
+                                      "branch_id":  5,
+                                      "branch_name":  "Adajan Branch",
+                                      "customers":  180,
+                                      "walk_in_count":  140,
+                                      "scheduled_count":  35,
+                                      "cancelled_count":  5,
+                                      "conversion":  97.2
+                                  },
+                                  {
+                                      "branch_id":  6,
+                                      "branch_name":  "Vesu Branch",
+                                      "customers":  140,
+                                      "walk_in_count":  100,
+                                      "scheduled_count":  33,
+                                      "cancelled_count":  7,
+                                      "conversion":  95
+                                  },
+                                  {
+                                      "branch_id":  7,
+                                      "branch_name":  "City Light Branch",
+                                      "customers":  100,
+                                      "walk_in_count":  80,
+                                      "scheduled_count":  20,
+                                      "cancelled_count":  0,
+                                      "conversion":  100
+                                  }
+                              ]
+             }
+}
