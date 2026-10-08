@@ -1,25 +1,9 @@
-# Static Admin Dashboard API
+# Admin Dashboard API
 
-GET /api/v1/admin/dashboard?from=2025-09-01&to=2025-09-30
+The admin overview loads GET /api/v1/admin/dashboard through the shared API client with the stored bearer token. The default API base URL is https://godine.cloud. Initial load and Reset send no query parameters, using the server default period.
 
-The static response in src/services/adminDashboardResponse.json follows the
-reference: success, message, data.summary, data.daily, data.top_restaurants,
-plus from/to/timezone metadata. Default counts: 2540 customers, 1980 walk-ins,
-560 scheduled, 120 cancelled. Dates are inclusive in Asia/Kolkata.
+Date filters use optional from/to parameters from the existing filter contract. Both dates must be selected and ordered. The server must scope summary, daily, and top_restaurants to the requested range.
 
-Cancellations are a subset of walk-ins. Total customers is walk-ins plus scheduled.
-The donut subtracts cancellations from walk-ins so slices add to 100%.
-Reference image percentages are inconsistent; actual chart percentages are
-calculated from counts. Royal Dine cancellations are zero so restaurant rows
-sum to the reference's 120 cancelled customers. Conversion is
-(total_customers - cancelled_count) / total_customers * 100.
+The response contains success/message/data with summary, daily, top_restaurants, and business_date. Cards use summary counts and growth. Walk-ins, scheduled, and cancelled are separate categories; the donut uses each count directly against total_customers. Daily bars use API rows, including zeros. Restaurant rows use server totals, cancellation counts, branch counts, and conversion. The business date is displayed from the API.
 
-Daily counts must sum to summary counts. Include every day with zeros. Return
-non-negative counts and top_restaurants sorted by customer count descending.
-Growth is the signed change against the previous equal-length period. The
-fixture only has growth for the full reference range; other ranges omit growth.
-
-adminDashboardDailyRestaurants.json is a local fixture for date filtering the
-restaurant table. With a real API, return summary/daily/top_restaurants already
-scoped to the requested dates. Fetch on date changes using the existing API
-client, handle loading/errors and stale requests, and replace static state.
+Loading, retryable errors, invalid response detection, empty states, and cancellation/stale response handling are implemented. No sample fixture is imported by the active admin overview. Dashboard responses are fetched fresh rather than cached indefinitely.
