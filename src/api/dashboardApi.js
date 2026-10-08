@@ -39,13 +39,13 @@ const getRestaurantDashboard = () => {
   return restaurantDashboardRequest;
 };
 
-const branchRequests = new Map();
-const getBranchDashboard = () => {
-  const token = storage.get(STORAGE_KEYS.authToken);
-  if (!branchRequests.has(token)) {
-    branchRequests.set(token, apiClient.get('/api/v1/branch/dashboard').finally(() => branchRequests.delete(token)));
+const getBranchDashboard = (filters = {}, options = {}) => {
+  const params = new URLSearchParams();
+  for (const key of ['from', 'to']) {
+    if (filters[key]) params.set(key, filters[key]);
   }
-  return branchRequests.get(token);
+  const query = params.toString();
+  return apiClient.get(`/api/v1/branch/dashboard${query ? '?' + query : ''}`, options);
 };
 
 export const dashboardApi = {

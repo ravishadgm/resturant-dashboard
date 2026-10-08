@@ -1,29 +1,9 @@
-# Static Branch Dashboard
+# Branch Dashboard API
 
-The branch dashboard matches the third panel of the supplied reference image.
-It reads src/services/branchDashboardResponse.json and makes no dashboard API call.
-Default range: 1–30 September 2026. Customer summary counts: 220 total, 160
-walk-ins, 52 scheduled, 8 cancelled. Table counts: 20 total, 12 available, 6
-occupied, 2 reserved. Current queue: 12 groups, 35-minute average wait,
-approximately 10 minutes until the next table.
+The branch admin overview now loads GET /api/v1/branch/dashboard using the shared API client and stored bearer token. Initial load and Reset send no query parameters and use the server default period.
 
-Proposed endpoint:
-GET /api/v1/branch/dashboard?from=2026-09-01&to=2026-09-30
+Date filters send from and to using the existing optional filter contract. Both dates must be selected and ordered. The server must return summary and daily already scoped to that range.
 
-Return the exact shape in branchDashboardResponse.json: success, message, from,
-to, timezone and data containing branch, summary, daily, tables and queue.
-Authenticate and scope to the signed-in branch. Dates are inclusive, grouped in
-Asia/Kolkata, sorted ascending, including zero-count dates.
+The response requires success/message/data with branch, summary, daily, tables, and queue. Customer cards use summary counts and growth; the charts use summary counts and daily rows. Table status uses tables.total/available/occupied/reserved. Queue status shows queue.business_date, current_waiting, avg_waiting_minutes, and next_table_in_minutes, preserving zero values. Tables and queue represent current snapshots.
 
-Summary counts must equal the daily sums. Total customers here is the combined
-walk-in/scheduled/cancelled count as in the reference. Summary growth is signed
-percentage change against the preceding equal-length range. The fixture retains
-the reference's sample growth values; they are shown only for the full sample
-period. Other date ranges show counts only because prior-period data is absent.
-Percentages in the charts are calculated from counts, without rounding the data.
-
-Tables and queue are current snapshots and do not change with historical dates.
-When integrating, use dashboardApi.getBranchDashboard with from/to parameters,
-load on date changes and handle loading/errors and stale requests.
-The API should return growth for each selected period so comparisons can appear
-for every range.
+Loading, retryable errors, invalid response detection, empty chart states, and aborted/stale requests are handled. The overview no longer imports the sample fixture.
