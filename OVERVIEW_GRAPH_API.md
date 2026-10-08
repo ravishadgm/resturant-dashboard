@@ -23,3 +23,4 @@ Authenticate using the existing API client and scope results to the signed-in re
 
 Return non-negative integer counts and rows sorted by date ascending.
 To integrate, fetch on date-range changes in OverviewGraph.jsx and replace overviewSampleData with response.data. The frontend already derives totals from daily rows. Replace the sample label with loading/error feedback and handle stale requests when filters change. No graph endpoint is called yet.
+  

@@ -1,32 +1,9 @@
 # Restaurant Dashboard API
 
-Static response: src/services/restaurantDashboardResponse.json.
-Uses Spice Hub and the four branches from the reference image, for
-1–30 September 2025. Summary: 640 customers, 480 walk-ins, 140 scheduled,
-20 cancelled. Branch performance:
-Ring Road 220 / 160 / 52 / 8;
-Adajan 180 / 140 / 35 / 5;
-Vesu 140 / 100 / 33 / 7;
-City Light 100 / 80 / 20 / 0.
-Values are customers / walk-ins / scheduled / cancelled.
+The restaurant overview calls authenticated GET /api/v1/restaurant/dashboard through the shared API client. Initial load and Reset use no query parameters, allowing the server to select its default period.
 
-GET /api/v1/restaurant/dashboard?from=2025-09-01&to=2025-09-30
-Optional branch_id filter; omit for all branches.
+Date and branch changes send optional from, to, and branch_id parameters. Both dates must be selected together and ordered. The existing filter contract expects the backend to return summary, daily, and branches scoped to those filters; daily rows do not require nested branch details.
 
-Return success/message/from/to/timezone and data containing restaurant,
-summary, daily, branches, matching the fixture. Scope to the signed-in restaurant.
-Date endpoints are inclusive in Asia/Kolkata. Include all dates with zeros.
+The success/message/data response supplies restaurant.restaurant_name, summary counts and growth, daily date/walk_in/scheduled/cancelled values, and branch total_customers/counts/conversion. Cards use server summary values and branch performance uses server totals and conversion. Distribution percentages are calculated from summary counts.
 
-In this restaurant dataset, walk-in, scheduled and cancelled are separate
-categories; total_customers equals their sum. Conversion is the non-cancelled
-share of customers. The daily rows include branch breakdowns for local static
-branch/date filtering. With a real API, filter the data on the server and return
-summary/daily/branches already scoped to the requested range/branch.
-
-Growth values from the reference are shown only for all branches over the
-full sample period because previous-period data is absent in the fixture.
-For API integration return growth against the preceding equal-length period.
-Connect through the existing API client on date/branch changes, with loading,
-error and stale-request handling. No dashboard API request is made now.
-
-The reference has off-by-one scheduled counts for Vesu and City Light. These are corrected to 33 and 20 so both branch totals and the 140 scheduled summary agree.
+Requests include the stored bearer token. The page shows loading, errors with Retry, and empty states. Filter changes and unmount abort the preceding request and ignore stale results. Restaurant responses are fetched fresh rather than cached indefinitely. The sample fixture is no longer used by the overview.

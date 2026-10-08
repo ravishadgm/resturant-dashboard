@@ -4,8 +4,6 @@ import { STORAGE_KEYS } from '../utils/constants';
 
 let adminDashboardRequest = null;
 let adminDashboardToken = null;
-let restaurantDashboardRequest = null;
-let restaurantDashboardToken = null;
 
 const getAdminDashboard = () => {
   const token = storage.get(STORAGE_KEYS.authToken);
@@ -23,20 +21,13 @@ const getAdminDashboard = () => {
   return adminDashboardRequest;
 };
 
-const getRestaurantDashboard = () => {
-  const token = storage.get(STORAGE_KEYS.authToken);
-
-  if (!restaurantDashboardRequest || token !== restaurantDashboardToken) {
-    restaurantDashboardToken = token;
-    restaurantDashboardRequest = apiClient
-      .get('/api/v1/restaurant/dashboard')
-      .catch((error) => {
-        restaurantDashboardRequest = null;
-        throw error;
-      });
+const getRestaurantDashboard = (filters = {}, options = {}) => {
+  const params = new URLSearchParams();
+  for (const key of ['from', 'to', 'branch_id']) {
+    if (filters[key] && filters[key] !== 'all') params.set(key, filters[key]);
   }
-
-  return restaurantDashboardRequest;
+  const query = params.toString();
+  return apiClient.get(`/api/v1/restaurant/dashboard${query ? '?' + query : ''}`, options);
 };
 
 export const dashboardApi = {
