@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Armchair,
+  Bell,
   Building2,
   ChevronDown,
   History,
@@ -52,6 +53,7 @@ export default function DashboardLayout() {
       [Armchair, "Tables", "/tables"],
       [ListOrdered, "Live queue", "/queue"],
       [History, "Complete history", "/history"],
+      [Bell, "Notifications", "/notifications"],
     ],
     [ROLES.RESTAURANT]: [
       [UserRound, "My Profile", "/my-profile"],
@@ -158,7 +160,7 @@ export default function DashboardLayout() {
             <strong>
               {location.pathname === "/dashboard"
                 ? "Dashboard overview"
-                : "Restaurant workspace"}
+                : location.pathname === "/notifications" ? "Announcements & notifications" : "Restaurant workspace"}
             </strong>
           </div>
           <div className="topbar-actions">

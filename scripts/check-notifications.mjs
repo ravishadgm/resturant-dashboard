@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import { audienceLabel, emptyAnnouncement, localDateTime, notificationStore, validateAnnouncement } from '../src/services/notificationService.js';
+assert.equal(localDateTime(''), '');
+assert.equal(localDateTime('invalid'), '');
+assert.equal(new Date(localDateTime('2030-01-01T01:00:00Z')).toISOString(), '2030-01-01T01:00:00.000Z');
+const now = Date.parse('2030-01-01T00:00:00Z');
+const announcement = { ...emptyAnnouncement(), title: 'Maintenance', message: 'Please plan ahead.' };
+assert.match(validateAnnouncement(emptyAnnouncement(), 'draft', now), /title/);
+assert.equal(validateAnnouncement({ ...announcement, message: '' }, 'draft', now), '');
+assert.match(validateAnnouncement({ ...announcement, message: ' ' }, 'sent', now), /message/);
+assert.match(validateAnnouncement({ ...announcement, audience: 'groups' }, 'sent', now), /group/);
+assert.match(validateAnnouncement({ ...announcement, audience: 'selected' }, 'sent', now), /recipient/);
+assert.equal(validateAnnouncement({ ...announcement, audience: 'selected', recipients: [{ id: '1', kind: 'customers', name: 'Customer' }] }, 'sent', now), '');
+assert.equal(validateAnnouncement({ ...announcement, audience: 'groups', groups: ['restaurants'] }, 'sent', now), '');
+for (const scheduledAt of ['', 'invalid', '2029-12-31T23:59:59Z', '2030-01-01T00:00:00Z']) {
+  assert.match(validateAnnouncement({ ...announcement, scheduledAt }, 'scheduled', now), /future/);
+}
+assert.equal(validateAnnouncement({ ...announcement, scheduledAt: '2030-01-01T01:00:00Z' }, 'scheduled', now), '');
+assert.match(validateAnnouncement({ ...announcement, title: 'x'.repeat(121) }, 'sent', now), /120/);
+assert.match(validateAnnouncement({ ...announcement, message: 'x'.repeat(2001) }, 'draft', now), /2,000/);
+assert.equal(audienceLabel(announcement), 'Everyone');
+assert.equal(audienceLabel({ ...announcement, audience: 'groups', groups: ['restaurants', 'customers'] }), 'Restaurants, Customers');
+const values = new Map();
+globalThis.localStorage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+const first = notificationStore('admin-a');
+const second = notificationStore('admin-b');
+assert.deepEqual(first.list(), []);
+const records = [{ ...announcement, id: 'one', status: 'draft' }, { ...announcement, id: 'two', status: 'scheduled' }, { ...announcement, id: 'three', status: 'sent' }];
+first.save(records);
+assert.deepEqual(notificationStore('admin-a').list(), records);
+assert.deepEqual(second.list(), []);
+values.set('broken', '{');
+assert.throws(() => notificationStore('broken').list());
+values.set('broken', '{}');
+assert.throws(() => notificationStore('broken').list(), /could not be read/);
+globalThis.localStorage.setItem = () => { throw new Error('Storage unavailable'); };
+assert.throws(() => first.save(records), /Storage unavailable/);
+console.log('Notification validation, scheduling, persistence, account isolation, and storage failure checks passed.');

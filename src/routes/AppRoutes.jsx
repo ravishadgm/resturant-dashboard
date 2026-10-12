@@ -9,6 +9,7 @@ import Queue from '../modules/queue/Queue';
 import RegistryPage from '../modules/operations/RegistryPage';
 import MyProfile from '../modules/profile/MyProfile';
 import ProtectedRoute from './ProtectedRoute';
+import Notifications from '../modules/notifications/Notifications';
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -21,6 +22,7 @@ export default function AppRoutes() {
       <Route path="/managers" element={<RegistryPage kind="managers"/>}/>
       <Route path="/tables" element={<RegistryPage kind="tables"/>}/>
       {PORTAL === 'admin' ? <>
+        <Route path="/notifications" element={<Notifications/>}/>
         <Route path="/restaurants" element={<RegistryPage kind="restaurants"/>}/>
         <Route path="/customers" element={<RegistryPage kind="customers"/>}/>
         <Route path="/queue" element={<Queue/>}/>

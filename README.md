@@ -32,3 +32,11 @@ npm run dev
 Use `git switch restaurant` to run the restaurant version. Stop the dev server before switching branches.
 
 The prebuilt `dist` directory is also committed on each branch for static hosting. Rebuild it whenever frontend code changes.
+
+## Admin notifications
+
+The admin-only `/notifications` page supports announcements, priorities, all-account/group/individual recipient selection, review, future scheduling, editable drafts, cancellation, duplication, and searchable sent history. Individual recipients load from the existing restaurant, manager, and customer APIs.
+
+This is a UI preview: announcements are stored per admin account in browser localStorage, sends are simulated, and schedules are saved without automatic delivery. No admin announcement delivery endpoint is present in the supplied API collection. Replace the browser adapter in `src/services/notificationService.js` when that API is available. Scheduling timestamps are stored as ISO instants and displayed in the browser timezone.
+
+Run `npm run check:notifications` for validation, scheduling, and persistence checks.
