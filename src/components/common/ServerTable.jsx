@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ChevronsUpDown, Search } from 'lucide-react';
 
 export default function ServerTable({ columns, data, loading, total = 0, onQueryChange, searchPlaceholder = 'Search records…', minWidth }) {
@@ -12,6 +12,12 @@ export default function ServerTable({ columns, data, loading, total = 0, onQuery
     String(a[sort.key] || '').localeCompare(String(b[sort.key] || '')) * (sort.dir === 'asc' ? 1 : -1)
   )), [data, sort]);
   const pages = Math.max(1, Math.ceil(total / limit));
+  useEffect(() => {
+    if (!loading && page > pages) {
+      setPage(pages);
+      onQueryChange({ page: pages, limit, search: activeSearch });
+    }
+  }, [loading, page, pages, limit, activeSearch, onQueryChange]);
   const start = rows.length ? ((page - 1) * limit) + 1 : 0;
   const end = rows.length ? Math.min(start + rows.length - 1, total) : 0;
 
