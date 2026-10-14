@@ -35,8 +35,8 @@ The prebuilt `dist` directory is also committed on each branch for static hostin
 
 ## Admin notifications
 
-The admin-only `/notifications` page supports announcements, priorities, all-account/group/individual recipient selection, review, future scheduling, editable drafts, cancellation, duplication, and searchable sent history. Individual recipients load from the existing restaurant, manager, and customer APIs.
+The admin-only /notifications page provides a simple title, message, and priority form. Check All restaurants or uncheck it to select multiple restaurants from a searchable, paginated list loaded from the restaurant API. Only sent messages appear in the shared dashboard table; draft tabs and actions are removed. Scheduling is removed; previously scheduled messages become drafts, and older drafts require restaurant-only recipient selection before sending.
 
-This is a UI preview: announcements are stored per admin account in browser localStorage, sends are simulated, and schedules are saved without automatic delivery. No admin announcement delivery endpoint is present in the supplied API collection. Replace the browser adapter in `src/services/notificationService.js` when that API is available. Scheduling timestamps are stored as ISO instants and displayed in the browser timezone.
+This is a UI preview: records are stored per admin account in browser localStorage and sends are simulated. No admin announcement delivery endpoint is present in the supplied API collection. Replace the browser adapter in src/services/notificationService.js when that API is available.
 
-Run `npm run check:notifications` for validation, scheduling, and persistence checks.
+Run npm run check:notifications for restaurant-targeting, draft migration, and persistence checks.
