@@ -1,6 +1,6 @@
-import BranchCustomerChart from '../dashboard/BranchCustomerChart';
+
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Clock3, Eye, Pencil, Plus } from 'lucide-react';
+import { Clock3, Eye, Pencil, Plus, Trash2 } from 'lucide-react';
 import MapLink from '../../components/common/MapLink';
 import BranchSchedule from './BranchSchedule';
 import CommonTable from '../../components/common/CommonTable';
@@ -8,6 +8,7 @@ import ServerTable from '../../components/common/ServerTable';
 import EntityForm from '../../components/common/EntityForm';
 import PageHeader from '../../components/common/PageHeader';
 import { Modal } from '../../components/common/Modal';
+import DeleteConfirmDialog from '../../components/common/DeleteConfirmDialog';
 import { useToast } from '../../context/ToastContext';
 import { entityService } from '../../services/entityService';
 import { restaurantApi } from '../../api/restaurantApi';
@@ -215,6 +216,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const loggedInRestaurantId=String(user.restaurant_id||user.restaurant?.restaurant_id||user.user_id||'');
   const [rows,setRows]=useState([]); const [loading,setLoading]=useState(true); const [mode,setMode]=useState(null); const [active,setActive]=useState(null); const [saving,setSaving]=useState(false); const [formError,setFormError]=useState(''); const [restaurantTotal,setRestaurantTotal]=useState(0); const [branchTotal,setBranchTotal]=useState(0); const [managerTotal,setManagerTotal]=useState(0); const [customerTotal,setCustomerTotal]=useState(0); const [tableTotal,setTableTotal]=useState(0); const [restaurantOptions,setRestaurantOptions]=useState([]); const [branchOptions,setBranchOptions]=useState([]); const [managerBranchId,setManagerBranchId]=useState(''); const [tableBranchId,setTableBranchId]=useState('');
   const [scheduleBranch,setScheduleBranch]=useState(null);
+  const [deleteTarget,setDeleteTarget]=useState(null);
   const lastQueryRef=useRef({page:1,limit:10,search:''});
   const load=async(params={page:1,limit:10,search:''},selectedManagerBranchId=managerBranchId,selectedTableBranchId=tableBranchId)=>{
     lastQueryRef.current=params;
@@ -355,12 +357,13 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const detailFields=kind==='restaurants'?config.fields.filter(field=>field.name!=='password'):kind==='branches'?branchDetailFields:config.fields;
   const displayFields=useMemo(()=>{if(kind==='restaurants')return restaurantListFields;if(kind==='branches')return branchListFields;if(kind==='managers')return managerListFields;if(kind==='customers')return customerListFields;if(kind==='tables')return user.role===ROLES.SUPER_ADMIN?adminTableListFields:tableListFields;return config.fields.filter(field=>!['address','device_token','created_at','password'].includes(field.name))},[config,kind,branchScope,user.role]);
   const dataColumns=displayFields.map(field=>({key:field.name,label:field.label,render:value=>renderRegistryValue(field,value)}));
-  const actionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="View" onClick={()=>{setActive(row);setMode('view')}}><Eye/></button>{!readOnly&&<button title="Edit" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button>}</div>};
+  const actionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="View" onClick={()=>{setActive(row);setMode('view')}}><Eye/></button>{!readOnly&&<button title="Edit" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button>}{kind==='branches'&&!readOnly&&branchScope==='restaurant'&&<button className="delete-action" title="Delete branch" aria-label={'Delete '+(row.name||row.branch_name||'branch')} onClick={()=>setDeleteTarget(row)}><Trash2/></button>}</div>};
   const customerActionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions"><button title="Update status" onClick={()=>{setActive(row);setMode('edit')}}><Pencil/></button></div>};
   const timingColumn={key:'timings',label:'Schedules',sortable:false,render:(_,row)=><button type="button" className="branch-timing-button" onClick={()=>setScheduleBranch(row)} aria-label={`Weekly schedules for ${row.name}`}><Clock3 size={16}/> Schedules</button>};
   const branchDateColumns=dataColumns.filter(column=>['created_at','updated_at'].includes(column.key));
   const branchInfoColumns=dataColumns.filter(column=>!['created_at','updated_at'].includes(column.key));
-  const columns=kind==='branches'?[...branchInfoColumns,...(branchScope==='restaurant'?[timingColumn]:[]),actionColumn,...branchDateColumns]:['managers','tables'].includes(kind)?dataColumns:kind==='customers'?[...dataColumns,customerActionColumn]:[...dataColumns,actionColumn];
+  const deleteActionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions">{!readOnly&&branchScope==='restaurant'&&<button className="delete-action" title={'Delete '+config.singular.toLowerCase()} aria-label={'Delete '+(kind==='tables'?(row.table_number||'table'):(row.name||'manager'))} onClick={()=>setDeleteTarget(row)}><Trash2/></button>}</div>};
+  const columns=kind==='branches'?[...branchInfoColumns,...(branchScope==='restaurant'?[timingColumn]:[]),...branchDateColumns,actionColumn]:['managers','tables'].includes(kind)?[...dataColumns,deleteActionColumn]:kind==='customers'?[...dataColumns,customerActionColumn]:[...dataColumns,actionColumn];
   const visibleRows=user.role===ROLES.MANAGER&&kind==='tables'?rows.filter(row=>String(row.branch_id)===String(user.branch_id)):rows;
   const canAdd=!readOnly&&kind!=='customers'&&(kind!=='managers'||branchScope==='restaurant');
   const changeManagerBranch=event=>{const nextBranch=event.target.value;setManagerBranchId(nextBranch);load({page:1,limit:10,search:''},nextBranch)};
@@ -368,9 +371,10 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const changeTableBranch=event=>{const nextBranch=event.target.value;setTableBranchId(nextBranch);load({page:1,limit:10,search:''},managerBranchId,nextBranch)};
   const tableBranchFilter=kind==='tables'&&branchScope==='restaurant'?<div className="table-card queue-branch-filter"><label className="field"><span>Branch</span><select value={tableBranchId} onChange={changeTableBranch} disabled={loading}>{branchOptions.length?branchOptions.map(option=><option key={option.value} value={option.value}>{option.label}</option>):<option value="">No branches available</option>}</select></label></div>:null;
   return <><PageHeader eyebrow="OPERATIONS" title={title||config.title} description={description||config.description} action={canAdd&&<button className="btn primary" onClick={()=>{setActive(null);setMode('add')}}><Plus size={17}/> Add {config.singular}</button>}/>{managerBranchFilter}{tableBranchFilter}{kind==='restaurants'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={restaurantTotal} onQueryChange={load} searchPlaceholder="Search restaurants"/>:kind==='branches'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={branchTotal} onQueryChange={load} searchPlaceholder="Search branches" minWidth={3000}/>:kind==='managers'?<ServerTable key={branchScope==='restaurant'?managerBranchId:'admin-managers'} columns={columns} data={visibleRows} loading={loading} total={managerTotal} onQueryChange={params=>load(params,managerBranchId)} searchPlaceholder="Search managers" minWidth={1500}/>:kind==='customers'?<ServerTable columns={columns} data={visibleRows} loading={loading} total={customerTotal} onQueryChange={load} searchPlaceholder="Search customers" minWidth={1200}/>:kind==='tables'?<ServerTable key={branchScope==='restaurant'?tableBranchId:'admin-tables'} columns={columns} data={visibleRows} loading={loading} total={tableTotal} onQueryChange={params=>load(params,managerBranchId,tableBranchId)} searchPlaceholder="Search tables" minWidth={user.role===ROLES.SUPER_ADMIN?3600:900}/>:<CommonTable columns={columns} data={visibleRows} loading={loading} searchPlaceholder={`Search ${config.title.toLowerCase()}…`}/>}
-    {kind==='branches' && user.role===ROLES.RESTAURANT && <BranchCustomerChart />}
+
     {scheduleBranch && <BranchSchedule key={scheduleBranch.branch_id??scheduleBranch.id} branch={scheduleBranch} onClose={()=>setScheduleBranch(null)}/>}
     <Modal open={mode==='add'||mode==='edit'} title={`${mode==='edit'?'Edit':'Add'} ${config.singular}`} onClose={()=>{if(!saving)setMode(null)}} size="wide"><EntityForm initial={formInitial} fields={formFields} onCancel={()=>setMode(null)} onSubmit={save} onFormChange={()=>setFormError('')} submitLabel={mode==='edit'?'Save changes':`Add ${config.singular}`} busy={saving} formError={formError}/></Modal>
+    <DeleteConfirmDialog open={!!deleteTarget} name={deleteTarget?.name||deleteTarget?.branch_name} entityLabel={config.singular.toLowerCase()} onClose={()=>setDeleteTarget(null)}/>
     <Modal open={mode==='view'} title={`${config.singular} details`} onClose={()=>setMode(null)} size="wide"><div className="registry-detail">{detailFields.map(field=><div key={field.name}><span>{field.label}</span><strong>{renderRegistryValue(field,active?.[field.name])}</strong></div>)}<div><span>Created at</span><strong>{active?.createdAt?new Date(active.createdAt).toLocaleString():'—'}</strong></div><div><span>Updated at</span><strong>{active?.updatedAt?new Date(active.updatedAt).toLocaleString():'—'}</strong></div></div><footer className="modal-actions"><button className="btn secondary" onClick={()=>setMode(null)}>Close</button>{!readOnly&&<button className="btn primary" onClick={()=>setMode('edit')}><Pencil size={16}/> Edit</button>}</footer></Modal>
   </>;
 }
