@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Armchair,
+  Bell,
   Building2,
   ChevronDown,
   History,
@@ -59,6 +60,7 @@ export default function DashboardLayout() {
       [Users, "Managers", "/managers"],
       [Armchair, "Tables", "/tables"],
       [UserRound, "My Profile", "/my-profile"],
+      [Bell, "Notifications", "/notifications"],
     ],
     [ROLES.MANAGER]: [
       [LayoutDashboard, "Overview", "/dashboard"],

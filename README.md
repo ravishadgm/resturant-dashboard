@@ -32,3 +32,7 @@ npm run dev
 Use `git switch restaurant` to run the restaurant version. Stop the dev server before switching branches.
 
 The prebuilt `dist` directory is also committed on each branch for static hosting. Rebuild it whenever frontend code changes.
+
+
+## Restaurant notifications
+The restaurant-only /notifications page mirrors the admin UI: title, message, colored priority, all branches or selected branches, and a sent-only table. Recipient lists use /api/v1/restaurant/branches. History is saved per restaurant and account in this browser; sending is a preview until a delivery API is connected. Run npm run check:notifications for targeted checks.
