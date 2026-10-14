@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { branchTableApi, TABLE_STATUSES } from '../../api/branchTableApi';
 import ServerTable from '../../components/common/ServerTable';
 import EntityForm from '../../components/common/EntityForm';
 import PageHeader from '../../components/common/PageHeader';
 import { Modal } from '../../components/common/Modal';
+import DeleteConfirmDialog from '../../components/common/DeleteConfirmDialog';
 import { useToast } from '../../context/ToastContext';
 
 const statusField = { name: 'status', label: 'Status', as: 'select', options: TABLE_STATUSES };
@@ -32,6 +33,7 @@ export default function TableList() {
   const [error, setError] = useState('');
   const [mode, setMode] = useState(null);
   const [active, setActive] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
   const query = useRef({ page: 1, limit: 10, search: '' });
@@ -98,12 +100,13 @@ export default function TableList() {
         ? <span className={`registry-status ${String(value || '').toLowerCase()}`}>{value || '-'}</span>
         : value == null || value === '' ? '-' : String(value),
     })),
-    { key: 'actions', label: 'Actions', sortable: false, className: 'actions-col', render: (_, row) => <div className="row-actions"><button title="Change status" aria-label={`Change status for table ${row.table_number}`} onClick={() => { setActive(row); setFormError(''); setMode('status'); }}><Pencil /></button></div> },
+    { key: 'actions', label: 'Actions', sortable: false, className: 'actions-col', render: (_, row) => <div className="row-actions"><button title="Change status" aria-label={`Change status for table ${row.table_number}`} onClick={() => { setActive(row); setFormError(''); setMode('status'); }}><Pencil /></button><button className="delete-action" title="Delete table" aria-label={'Delete table '+row.table_number} onClick={() => setDeleteTarget(row)}><Trash2 /></button></div> },
   ];
   return <>
     <PageHeader eyebrow="BRANCH OWNER" title="Table" description="Manage your branch tables, seating capacity, and availability." action={<button className="btn primary" onClick={() => { setActive(null); setFormError(''); setMode('add'); }}><Plus size={17} /> Add Table</button>} />
     {error && <div className="profile-error" role="alert">{error}<button className="btn secondary" disabled={loading} onClick={() => load()}>Try again</button></div>}
     <ServerTable columns={columns} data={rows} total={total} loading={loading} onQueryChange={load} searchPlaceholder="Search tables" minWidth={1000} />
+    <DeleteConfirmDialog open={!!deleteTarget} name={deleteTarget?.table_number} entityLabel="table" onClose={() => setDeleteTarget(null)}/>
     <Modal open={mode !== null} title={mode === 'add' ? 'Add Table' : `Change status - ${active?.table_number || 'Table'}`} onClose={close}>
       <EntityForm key={mode === 'add' ? 'add' : active?.table_id} initial={mode === 'add' ? initialTable : active} fields={mode === 'add' ? createFields : statusFields} onSubmit={save} onCancel={close} onFormChange={() => setFormError('')} submitLabel={mode === 'add' ? 'Add Table' : 'Save status'} busy={saving} formError={formError} />
     </Modal>
