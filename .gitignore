@@ -1,1 +1,4 @@
 node_modules/
+
+# Generated deployment builds, source snapshots, and local SSH keys
+/hostinger/
