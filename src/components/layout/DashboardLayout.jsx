@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Armchair,
+  Bell,
   Building2,
   CalendarDays,
   ChevronDown,
@@ -44,7 +45,7 @@ export default function DashboardLayout() {
     };
   }, [mobile]);
   const roleLinks = {
-    [ROLES.BRANCH]: [[LayoutDashboard, "Overview", "/dashboard"], [UserRound, "My Profile", "/my-profile"], [CalendarDays, "Schedules", "/schedules"], [Armchair, "Table", "/tables"], [Users, "Customer", "/customers"], [ListOrdered, "Queue", "/queue"]],
+    [ROLES.BRANCH]: [[LayoutDashboard, "Overview", "/dashboard"], [UserRound, "My Profile", "/my-profile"], [CalendarDays, "Schedules", "/schedules"], [Armchair, "Table", "/tables"], [Users, "Customer", "/customers"], [ListOrdered, "Queue", "/queue"], [Bell, "Notifications", "/notifications"]],
     [ROLES.SUPER_ADMIN]: [
       [LayoutDashboard, "Overview", "/dashboard"],
       [Store, "Restaurants", "/restaurants"],

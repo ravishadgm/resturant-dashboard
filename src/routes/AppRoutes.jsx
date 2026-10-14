@@ -7,6 +7,7 @@ import BranchSchedules from '../modules/operations/BranchSchedules';
 import BranchProfile from '../modules/profile/BranchProfile';
 import BranchDashboard from '../modules/dashboard/BranchDashboard';
 import ProtectedRoute from './ProtectedRoute';
+import Notifications from '../modules/notifications/Notifications';
 import TableList from '../modules/tables/TableList';
 import CustomerList from '../modules/customers/CustomerList';
 import BranchQueueList from '../modules/queue/BranchQueueList';
@@ -22,6 +23,7 @@ export default function AppRoutes() {
       <Route path="/tables" element={<TableList/>}/>
       <Route path="/customers" element={<CustomerList/>}/>
       <Route path="/queue" element={<BranchQueueList/>}/>
+      <Route path="/notifications" element={<Notifications/>}/>
     </Route></Route>
     <Route path="*" element={<Navigate to={signedIn?'/dashboard':'/login'} replace/>}/>
   </Routes>;

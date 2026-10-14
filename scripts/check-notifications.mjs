@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import { emptyAnnouncement, audienceLabel, validateAnnouncement, notificationStore } from '../src/services/notificationService.js';
+const valid = { ...emptyAnnouncement(), title: 'Update', message: 'Branch update' };
+assert.equal(validateAnnouncement(valid), '');
+assert.equal(audienceLabel(valid), 'All customers');
+assert.equal(validateAnnouncement({ ...valid, groups: ['managers'] }), '');
+assert.match(validateAnnouncement({ ...valid, groups: [] }), /Select/);
+assert.match(validateAnnouncement({ ...valid, groups: ['restaurants'] }), /Only/);
+assert.match(validateAnnouncement({ ...valid, audience: 'selected' }), /at least one/);
+const selected = { ...valid, audience: 'selected', groups: ['customers', 'managers'], recipients: [{ id: '1', kind: 'customers', name: 'Asha' }, { id: '1', kind: 'managers', name: 'Jay' }] };
+assert.equal(validateAnnouncement(selected), '');
+assert.equal(audienceLabel(selected), 'Asha (Customer), Jay (Manager)');
+assert.match(validateAnnouncement({ ...valid, priority: 'invalid' }), /priority/);
+assert.match(validateAnnouncement({ ...selected, recipients: [{ id: '1', kind: 'restaurants' }] }), /Selected recipients|valid/);
+const values = new Map();
+globalThis.localStorage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+const record = { ...valid, id: '1', status: 'sent' };
+notificationStore('branch-1-user-a').save([record]);
+assert.deepEqual(notificationStore('branch-1-user-a').list(), [record]);
+assert.deepEqual(notificationStore('branch-2-user-a').list(), []);
+values.set('broken', '{}');
+assert.throws(() => notificationStore('broken').list());
+console.log('Branch notification validation and storage isolation checks passed.');
+
+assert.match(validateAnnouncement({ ...selected, groups: ['customers'] }), /must match/);
