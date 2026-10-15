@@ -53,12 +53,12 @@ export default function ServerTable({ columns, data, loading, total = 0, onQuery
         </form>
       </div>}
       <div className="table-scroll">
-        <table className="server-data-table" style={minWidth ? { minWidth } : undefined}>
+        <table className="server-data-table" style={minWidth ? { '--table-min-width': `${minWidth}px` } : undefined}>
           <thead>
             <tr>{columns.map(column => <th key={column.key} className={column.className || ''}>{column.sortable === false ? column.label : <button onClick={() => toggleSort(column.key)}>{column.label}<ChevronsUpDown size={14} /></button>}</th>)}</tr>
           </thead>
           <tbody>
-            {loading ? Array.from({ length: 4 }).map((_, rowIndex) => <tr key={rowIndex}>{columns.map((column, columnIndex) => <td key={column.key}><span className="skeleton" style={{ width: `${55 + (rowIndex + columnIndex) % 3 * 15}%` }} /></td>)}</tr>) : rows.length ? rows.map(row => <tr key={row.id}>{columns.map(column => <td key={column.key} data-label={column.label}>{column.render ? column.render(row[column.key], row) : row[column.key]}</td>)}</tr>) : <tr><td colSpan={columns.length}><div className="empty-state"><Search size={28} /><h3>No records found</h3><p>Try a different search.</p></div></td></tr>}
+            {loading ? Array.from({ length: 4 }).map((_, rowIndex) => <tr key={rowIndex}>{columns.map((column, columnIndex) => <td key={column.key} data-label={column.label}><span className="skeleton" style={{ width: `${55 + (rowIndex + columnIndex) % 3 * 15}%` }} /></td>)}</tr>) : rows.length ? rows.map(row => <tr key={row.id}>{columns.map(column => <td key={column.key} data-label={column.label}><div className="table-cell-value">{column.render ? column.render(row[column.key], row) : (row[column.key] ?? '?')}</div></td>)}</tr>) : <tr><td colSpan={columns.length}><div className="empty-state"><Search size={28} /><h3>No records found</h3><p>Try a different search.</p></div></td></tr>}
           </tbody>
         </table>
       </div>
