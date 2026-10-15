@@ -136,3 +136,18 @@ html,body,#root{width:100%;max-width:100%;overflow-x:hidden}.app-main,.page-cont
 
 .row-actions .delete-action{color:var(--danger)}.row-actions .delete-action:hover{background:#fff0f2;border-color:#f5c3ca}
 @media(min-width:601px){th.actions-col{text-align:center}th.actions-col>button{justify-content:center;width:100%}.row-actions{justify-content:center}}
+
+/* Dropdown menus render outside scrolling cards and modals at every viewport size. */
+.responsive-select{position:relative;min-width:0;width:100%}
+.responsive-select-native{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;border:0!important;clip-path:inset(50%);overflow:hidden;pointer-events:none}
+.responsive-select-trigger{width:100%;min-width:0;min-height:43px;padding:10px 12px;border:1px solid #dedce6;border-radius:9px;background:#fff;color:#333;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;font-size:13px}
+.responsive-select-trigger>span,.responsive-select-menu [role=option]>span{min-width:0;overflow-wrap:anywhere}
+.responsive-select-trigger svg,.responsive-select-menu svg{flex-shrink:0}
+.responsive-select-trigger:focus-visible,.responsive-select-trigger[aria-expanded=true]{outline:2px solid var(--purple);outline-offset:2px}
+.responsive-select-menu{position:fixed;z-index:1100;overflow-y:auto;overscroll-behavior:contain;padding:5px;border:1px solid var(--border);border-radius:9px;background:#fff;box-shadow:0 8px 24px #21174824;font-family:'DM Sans',sans-serif}
+.responsive-select-menu [role=option]{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:10px;border-radius:6px;color:var(--ink);font-size:13px;cursor:pointer}
+.responsive-select-menu [role=option][data-active=true],.responsive-select-menu [role=option][aria-selected=true]{background:#f1ebff;color:var(--purple)}
+.responsive-select-menu [role=option][aria-disabled=true]{opacity:.45;cursor:default}
+.rows-select .responsive-select{width:72px;flex:none}
+.rows-select .responsive-select-trigger{min-height:32px;padding:5px 8px;font-size:11px;border-radius:7px}
+.field{min-width:0}.field-error .responsive-select-trigger{border-color:#e66}

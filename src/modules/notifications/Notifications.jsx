@@ -1,3 +1,4 @@
+import ResponsiveSelect from '../../components/common/ResponsiveSelect';
 import { useEffect, useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
@@ -119,7 +120,7 @@ export default function Notifications() {
           {form.audience === 'selected' && <RecipientPicker selected={form.recipients} onChange={value => change('recipients', value)}/>}
           <p className="nt-recipient-summary" aria-live="polite"><strong>To:</strong> {form.audience === 'selected' ? form.recipients.length ? form.recipients.length + ' selected customer' + (form.recipients.length === 1 ? '' : 's') : 'Choose customers from the list above' : audienceLabel(form) + ' in this branch'}</p>
         </fieldset>
-        <label className="field"><span>Priority</span><select className={'nt-priority-select ' + form.priority} value={form.priority} onChange={event => change('priority', event.target.value)}><option value="normal">Normal</option><option value="important">Important</option><option value="urgent">Urgent</option></select></label>
+        <label className="field"><span>Priority</span><ResponsiveSelect aria-label="Priority" className={'nt-priority-select ' + form.priority} value={form.priority} onChange={event => change('priority', event.target.value)}><option value="normal">Normal</option><option value="important">Important</option><option value="urgent">Urgent</option></ResponsiveSelect></label>
         <p className="nt-hint">Preview only. No messages will be delivered.</p>
       </div><footer className="modal-actions"><button type="button" className="btn secondary" onClick={() => setForm(null)}>Cancel</button><button type="submit" className="btn primary">Send preview</button></footer></form>}
     </Modal>

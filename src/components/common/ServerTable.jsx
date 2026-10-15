@@ -1,3 +1,4 @@
+import ResponsiveSelect from './ResponsiveSelect';
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ChevronsUpDown, Search } from 'lucide-react';
 
@@ -63,7 +64,7 @@ export default function ServerTable({ columns, data, loading, total = 0, onQuery
       </div>
       <div className="table-footer">
         <span>Showing {start}–{end} of {total}</span>
-        <div className="rows-select"><span>Rows per page</span><select value={limit} onChange={changeLimit} disabled={loading}><option>5</option><option>10</option><option>20</option></select></div>
+        <div className="rows-select"><span>Rows per page</span><ResponsiveSelect aria-label="Rows per page" value={limit} onChange={changeLimit} disabled={loading}><option>5</option><option>10</option><option>20</option></ResponsiveSelect></div>
         <div className="pager"><button disabled={loading || page === 1} onClick={() => changePage(page - 1)}><ChevronLeft size={18} /></button><span>{page} / {pages}</span><button disabled={loading || page >= pages} onClick={() => changePage(page + 1)}><ChevronRight size={18} /></button></div>
       </div>
     </div>
