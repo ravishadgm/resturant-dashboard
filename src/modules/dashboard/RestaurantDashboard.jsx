@@ -1,3 +1,4 @@
+import ResponsiveSelect from '../../components/common/ResponsiveSelect';
 import { useEffect, useState } from 'react';
 import { ArrowDown, ArrowUp, CalendarDays, ListOrdered, Users, XCircle } from 'lucide-react';
 import { dashboardApi } from '../../api/dashboardApi';
@@ -53,7 +54,7 @@ export default function RestaurantDashboard() {
       <div className="rd-filters">
         <label>From date<input type="date" value={from} onChange={event => setFrom(event.target.value)} /></label>
         <label>To date<input type="date" value={to} onChange={event => setTo(event.target.value)} /></label>
-        <label>Branch<select value={branchId} onChange={event => setBranchId(event.target.value)}><option value="all">All Branches</option>{branchOptions.map(branch => <option key={branch.branch_id} value={branch.branch_id}>{branch.branch_name}</option>)}</select></label>
+        <label>Branch<ResponsiveSelect aria-label="Branch" value={branchId} onChange={event => setBranchId(event.target.value)}><option value="all">All Branches</option>{branchOptions.map(branch => <option key={branch.branch_id} value={branch.branch_id}>{branch.branch_name}</option>)}</ResponsiveSelect></label>
         <button className="btn secondary" onClick={() => { setFrom(''); setTo(''); setBranchId('all'); }}>Reset</button>
       </div>
     </header>
