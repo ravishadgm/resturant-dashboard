@@ -86,3 +86,45 @@ html,body,#root{width:100%;max-width:100%;overflow-x:hidden}.app-main,.page-cont
 @media(max-width:380px){.admin-summary-grid{grid-template-columns:1fr}}
 
 .row-actions .delete-action{color:var(--danger)}.row-actions .delete-action:hover{background:#fff0f2;border-color:#f5c3ca}
+
+/* Shared responsive dropdowns for the admin portal. */
+.responsive-select{position:relative;min-width:0;width:100%}
+.responsive-select-native{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;border:0!important;clip-path:inset(50%);overflow:hidden;pointer-events:none}
+.responsive-select-trigger{width:100%;min-width:0;min-height:43px;padding:10px 12px;border:1px solid #dedce6;border-radius:9px;background:#fff;color:#333;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;font-size:13px}
+.responsive-select-trigger>span,.responsive-select-menu [role=option]>span{min-width:0;overflow-wrap:anywhere}
+.responsive-select-trigger svg,.responsive-select-menu svg{flex-shrink:0}
+.responsive-select-trigger:focus-visible,.responsive-select-trigger[aria-expanded=true]{outline:2px solid var(--purple);outline-offset:2px}
+.responsive-select-menu{position:fixed;z-index:1100;overflow-y:auto;overscroll-behavior:contain;padding:5px;border:1px solid var(--border);border-radius:9px;background:#fff;box-shadow:0 8px 24px #21174824;font-family:'DM Sans',sans-serif}
+.responsive-select-menu [role=option]{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:10px;border-radius:6px;color:var(--ink);font-size:13px;cursor:pointer}
+.responsive-select-menu [role=option][data-active=true],.responsive-select-menu [role=option][aria-selected=true]{background:#f1ebff;color:var(--purple)}
+.responsive-select-menu [role=option][aria-disabled=true]{opacity:.45;cursor:default}
+.rows-select .responsive-select{width:72px;flex:none}
+.rows-select .responsive-select-trigger{min-height:32px;padding:5px 8px;font-size:11px;border-radius:7px}
+.field{min-width:0}.field-error .responsive-select-trigger{border-color:#e66}
+
+/* Keep record labels and values visible together on phones and tablets. */
+.server-data-table{min-width:var(--table-min-width,1450px)}
+.table-cell-value{min-width:0;max-width:100%}
+.table-card,.table-scroll{min-width:0;max-width:100%}
+.admin-table-scroll,.admin-chart-scroll,.rd-table-scroll,.rd-scroll,.reference-daily-scroll,.overview-data-scroll,.queue-table-scroll,.branch-schedule-scroll{max-width:100%;overflow-x:auto}
+@media(max-width:800px){
+  .table-scroll{overflow-x:auto}
+  .table-scroll table{display:block;width:100%;min-width:0;max-width:100%}
+  .table-scroll thead{display:none}
+  .table-scroll tbody{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:10px;background:#f8f7fb;width:100%;min-width:0}
+  .table-scroll tbody tr{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;max-width:100%;background:#fff;border:1px solid var(--border);border-radius:10px;padding:7px;box-shadow:0 2px 8px #2e294508}
+  .table-scroll tbody td{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);align-items:start;gap:12px;width:100%;min-width:0;max-width:100%;height:auto;min-height:38px;padding:9px;border:0;text-align:right;white-space:normal;overflow-wrap:anywhere}
+  .table-scroll tbody td:before{content:attr(data-label);min-width:0;color:#8b8798;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;text-align:left;overflow-wrap:anywhere}
+  .table-scroll tbody td.check:before{content:'Select'}
+  .table-scroll tbody td:not([data-label]):not(.check){grid-template-columns:minmax(0,1fr)}
+  .table-scroll tbody td:not([data-label]):not(.check):before{display:none}
+  .table-cell-value{width:100%;white-space:normal;overflow-wrap:anywhere}
+  .table-cell-value a{overflow-wrap:anywhere;word-break:break-word}
+  .table-cell-value .person-cell{margin-left:0;flex-wrap:wrap;gap:7px}
+  .table-cell-value .person-cell>div{min-width:0}
+  .table-cell-value .row-actions{margin-left:0;justify-content:flex-end;flex-wrap:wrap}
+  .table-cell-value .registry-status,.table-cell-value .status{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+  .table-scroll .skeleton{min-width:0}
+  .table-footer{height:auto;padding:14px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+  .table-footer>span{width:100%}.rows-select{margin-left:0;min-width:0}.pager{margin-left:auto}
+}

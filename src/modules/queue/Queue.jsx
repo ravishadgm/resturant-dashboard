@@ -1,3 +1,4 @@
+import ResponsiveSelect from '../../components/common/ResponsiveSelect';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader';
@@ -191,11 +192,11 @@ export default function Queue() {
     <div className="table-card queue-branch-filter">
       <label className="field">
         <span>Branch</span>
-        <select value={branchId} onChange={handleBranchChange} disabled={loading}>
+        <ResponsiveSelect aria-label="Branch" value={branchId} onChange={handleBranchChange} disabled={loading}>
           {branchOptions.length
             ? branchOptions.map(option => <option key={option.value} value={option.value}>{option.name}</option>)
             : <option value="">No branches available</option>}
-        </select>
+        </ResponsiveSelect>
       </label>
     </div>
     <ServerTable

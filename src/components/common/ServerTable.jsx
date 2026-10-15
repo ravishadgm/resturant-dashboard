@@ -1,3 +1,4 @@
+import ResponsiveSelect from './ResponsiveSelect';
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ChevronsUpDown, Search } from 'lucide-react';
 
@@ -58,18 +59,18 @@ export default function ServerTable({ columns, data, loading, total = 0, onQuery
         </form>
       </div>
       <div className="table-scroll">
-        <table className="server-data-table" style={minWidth ? { minWidth } : undefined}>
+        <table className="server-data-table" style={minWidth ? { '--table-min-width': `${minWidth}px` } : undefined}>
           <thead>
             <tr>{columns.map(column => <th key={column.key} className={column.className || ''}>{column.sortable === false ? column.label : <button onClick={() => toggleSort(column.key)}>{column.label}<ChevronsUpDown size={14} /></button>}</th>)}</tr>
           </thead>
           <tbody>
-            {loading ? Array.from({ length: 4 }).map((_, rowIndex) => <tr key={rowIndex}>{columns.map((column, columnIndex) => <td key={column.key}><span className="skeleton" style={{ width: `${55 + (rowIndex + columnIndex) % 3 * 15}%` }} /></td>)}</tr>) : rows.length ? rows.map(row => <tr key={row.id}>{columns.map(column => <td key={column.key} data-label={column.label}>{column.render ? column.render(row[column.key], row) : row[column.key]}</td>)}</tr>) : <tr><td colSpan={columns.length}><div className="empty-state"><Search size={28} /><h3>No records found</h3><p>Try a different search.</p></div></td></tr>}
+            {loading ? Array.from({ length: 4 }).map((_, rowIndex) => <tr key={rowIndex}>{columns.map((column, columnIndex) => <td key={column.key} data-label={column.label}><span className="skeleton" style={{ width: `${55 + (rowIndex + columnIndex) % 3 * 15}%` }} /></td>)}</tr>) : rows.length ? rows.map(row => <tr key={row.id}>{columns.map(column => <td key={column.key} data-label={column.label}><div className="table-cell-value">{column.render ? column.render(row[column.key], row) : (row[column.key] ?? '-')}</div></td>)}</tr>) : <tr><td colSpan={columns.length}><div className="empty-state"><Search size={28} /><h3>No records found</h3><p>Try a different search.</p></div></td></tr>}
           </tbody>
         </table>
       </div>
       <div className="table-footer">
         <span>Showing {start}–{end} of {total}</span>
-        <div className="rows-select"><span>Rows per page</span><select value={limit} onChange={changeLimit} disabled={loading}><option>5</option><option>10</option><option>20</option></select></div>
+        <div className="rows-select"><span>Rows per page</span><ResponsiveSelect aria-label="Rows per page" value={limit} onChange={changeLimit} disabled={loading}><option>5</option><option>10</option><option>20</option></ResponsiveSelect></div>
         <div className="pager"><button disabled={loading || page === 1} onClick={() => changePage(page - 1)}><ChevronLeft size={18} /></button><span>{page} / {pages}</span><button disabled={loading || page >= pages} onClick={() => changePage(page + 1)}><ChevronRight size={18} /></button></div>
       </div>
     </div>
