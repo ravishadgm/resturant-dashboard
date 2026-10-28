@@ -1,6 +1,9 @@
-export const emptyAnnouncement = () => ({ title: '', message: '', priority: 'normal', audience: 'all-branches', recipients: [] });
+export const emptyAnnouncement = () => ({ title: '', message: '', audience: 'all-admins', recipients: [] });
 export function audienceLabel(record) {
-  return record.audience === 'all-branches' ? 'All branches' : record.recipients.map(recipient => recipient.name).join(', ') || 'Choose branches';
+  if (record.audience === 'all-admins') return 'All admins';
+  if (record.audience === 'all-customers') return 'All customers';
+  if (record.audience === 'all-branches') return 'All branches';
+  return record.recipients.map(recipient => recipient.name).join(', ') || 'Choose branches';
 }
 export function branchAnnouncement(record) {
   return { ...record, recipients: [...record.recipients] };
@@ -11,9 +14,8 @@ export function validateAnnouncement(record, status) {
   if (record.title.trim().length > 120) return 'Keep the title within 120 characters.';
   if (!record.message.trim()) return 'Enter a notification message.';
   if (record.message.length > 2000) return 'Keep the message within 2,000 characters.';
-  if (!['normal', 'important', 'urgent'].includes(record.priority)) return 'Choose a valid priority.';
-  if (!['all-branches', 'branch'].includes(record.audience)) return 'Choose all branches or specific branches.';
-  if (record.recipients.some(recipient => recipient.kind !== 'branches' || !recipient.id)) return 'Only branches can receive these notifications.';
+  if (!['all-admins', 'all-customers', 'all-branches', 'branch'].includes(record.audience)) return 'Choose admins, customers, or branches.';
+  if (record.audience === 'branch' && record.recipients.some(recipient => recipient.kind !== 'branches' || !recipient.id)) return 'Only branches can receive these notifications.';
   if (record.audience === 'branch' && !record.recipients.length) return 'Choose at least one branch.';
   return '';
 }

@@ -366,7 +366,7 @@ export default function RegistryPage({ kind, readOnly=false, title, description 
   const deleteActionColumn={key:'actions',label:'Actions',sortable:false,className:'actions-col',render:(_,row)=><div className="row-actions">{!readOnly&&branchScope==='restaurant'&&<button className="delete-action" title={'Delete '+config.singular.toLowerCase()} aria-label={'Delete '+(kind==='tables'?(row.table_number||'table'):(row.name||'manager'))} onClick={()=>setDeleteTarget(row)}><Trash2/></button>}</div>};
   const columns=kind==='branches'?[...branchInfoColumns,...(branchScope==='restaurant'?[timingColumn]:[]),...branchDateColumns,actionColumn]:['managers','tables'].includes(kind)?[...dataColumns,deleteActionColumn]:kind==='customers'?[...dataColumns,customerActionColumn]:[...dataColumns,actionColumn];
   const visibleRows=user.role===ROLES.MANAGER&&kind==='tables'?rows.filter(row=>String(row.branch_id)===String(user.branch_id)):rows;
-  const canAdd=!readOnly&&kind!=='customers'&&(kind!=='managers'||branchScope==='restaurant');
+  const canAdd=!readOnly&&!['customers','tables'].includes(kind)&&(kind!=='managers'||branchScope==='restaurant');
   const changeManagerBranch=event=>{const nextBranch=event.target.value;setManagerBranchId(nextBranch);load({page:1,limit:10,search:''},nextBranch)};
   const managerBranchFilter=kind==='managers'&&branchScope==='restaurant'?<div className="table-card queue-branch-filter"><BranchSelect value={managerBranchId} onChange={changeManagerBranch} options={branchOptions} disabled={loading}/></div>:null;
   const changeTableBranch=event=>{const nextBranch=event.target.value;setTableBranchId(nextBranch);load({page:1,limit:10,search:''},managerBranchId,nextBranch)};
