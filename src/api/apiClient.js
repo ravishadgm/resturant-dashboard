@@ -2,6 +2,18 @@ import { storage } from '../services/storageService';
 import { STORAGE_KEYS } from '../utils/constants';
 
 export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://godine.cloud').replace(/\/$/, '');
+export const AUTH_EXPIRED_EVENT = 'restrodesk:auth-expired';
+
+const isExpiredTokenResponse = (payload, status) =>
+  status === 401 ||
+  status === 403 ||
+  (payload?.success === false && /token.*(?:invalid|expired)|(?:invalid|expired).*token/i.test(payload?.message || ''));
+
+const expireSession = () => {
+  storage.remove(STORAGE_KEYS.session);
+  storage.remove(STORAGE_KEYS.authToken);
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+};
 
 const getErrorMessage = (payload, status) => {
   if (typeof payload === 'string' && payload.trim()) return payload;
@@ -27,6 +39,11 @@ async function request(path, options = {}) {
 
     const contentType = response.headers.get('content-type') || '';
     const payload = contentType.includes('application/json') ? await response.json() : await response.text();
+
+    if (isExpiredTokenResponse(payload, response.status)) {
+      expireSession();
+      throw new Error('Your session has expired. Please sign in again.');
+    }
 
     if (!response.ok) throw new Error(getErrorMessage(payload, response.status));
     return payload;
