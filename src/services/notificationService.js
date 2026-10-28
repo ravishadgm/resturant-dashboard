@@ -1,6 +1,8 @@
-export const emptyAnnouncement = () => ({ title: '', message: '', priority: 'normal', audience: 'all-restaurants', recipients: [] });
+export const emptyAnnouncement = () => ({ title: '', message: '', audience: 'all', groups: ['restaurants', 'customers'], recipients: [] });
+export const GROUPS = { restaurants: 'Restaurants', customers: 'Customers', managers: 'Managers' };
 
 export function audienceLabel(record) {
+  if (record.audience === 'all' && Array.isArray(record.groups)) return record.groups.filter(group => GROUPS[group]).map(group => 'All ' + GROUPS[group].toLowerCase()).join(', ');
   if (record.audience === 'all-restaurants') return 'All restaurants';
   if (record.audience === 'restaurant') return record.recipients.map(recipient => recipient.name).join(', ') || 'Choose restaurants';
   // Keep older history accurate without allowing these audiences in new sends.
@@ -9,11 +11,14 @@ export function audienceLabel(record) {
   return record.recipients.map(recipient => recipient.name).join(', ') || 'Choose a restaurant';
 }
 
-export function restaurantAnnouncement(record) {
-  const { timing, scheduledAt, groups, searchText, ...current } = record;
-  const recipients = (record.recipients || []).filter(recipient => recipient.kind === 'restaurants');
-  const allowed = ['all-restaurants', 'restaurant'].includes(record.audience);
-  return { ...current, audience: allowed ? record.audience : 'restaurant', recipients };
+export function notificationAnnouncement(record) {
+  const groups = Array.isArray(record.groups)
+    ? record.groups.filter(group => GROUPS[group])
+    : record.audience === 'all-restaurants' || record.audience === 'restaurant'
+      ? ['restaurants']
+      : ['restaurants', 'customers'];
+  const { timing, scheduledAt, searchText, ...current } = record;
+  return { ...current, audience: 'all', groups, recipients: [] };
 }
 
 export function validateAnnouncement(record, status) {
@@ -21,12 +26,11 @@ export function validateAnnouncement(record, status) {
   if (!record.title.trim()) return 'Enter a notification title.';
   if (record.title.trim().length > 120) return 'Keep the title within 120 characters.';
   if (record.message.length > 2000) return 'Keep the message within 2,000 characters.';
-  if (!['normal', 'important', 'urgent'].includes(record.priority)) return 'Choose a valid priority.';
-  if (!['all-restaurants', 'restaurant'].includes(record.audience)) return 'Notifications can only be sent to restaurants.';
-  if (record.recipients.some(recipient => recipient.kind !== 'restaurants')) return 'Notifications can only be sent to restaurants.';
+  if (record.audience !== 'all') return 'Notifications can only be sent to all members of a recipient group.';
+  if (!record.groups.length) return 'Select at least one recipient group.';
+  if (record.groups.some(group => !GROUPS[group])) return 'Only restaurants, customers, and managers can receive notifications.';
   if (status === 'draft') return '';
   if (!record.message.trim()) return 'Enter a notification message.';
-  if (record.audience === 'restaurant' && (!record.recipients.length || record.recipients.some(recipient => !recipient.id))) return 'Choose at least one restaurant.';
   return '';
 }
 
@@ -37,7 +41,7 @@ export function notificationStore(key) {
       const records = JSON.parse(localStorage.getItem(key) || '[]');
       if (!Array.isArray(records) || records.some(record => !record || typeof record.id !== 'string' || typeof record.title !== 'string' || typeof record.message !== 'string' || !Array.isArray(record.recipients) || !['draft', 'scheduled', 'sent'].includes(record.status))) throw new Error('Saved notifications could not be read.');
       return records.map(record => record.status === 'sent' ? record : {
-        ...restaurantAnnouncement(record),
+        ...notificationAnnouncement(record),
         status: 'draft',
       });
     },

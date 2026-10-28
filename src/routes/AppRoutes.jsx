@@ -5,7 +5,6 @@ import { PORTAL_ROLE } from '../utils/portal';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import Login from '../modules/auth/Login';
 
-import Queue from '../modules/queue/Queue';
 import RegistryPage from '../modules/operations/RegistryPage';
 
 import ProtectedRoute from './ProtectedRoute';
@@ -20,13 +19,10 @@ export default function AppRoutes() {
       <Route path="/dashboard" element={<AdminDashboard/>}/>
       <Route path="/branches" element={<RegistryPage kind="branches"/>}/>
       <Route path="/managers" element={<RegistryPage kind="managers"/>}/>
-      <Route path="/tables" element={<RegistryPage kind="tables"/>}/>
 
         <Route path="/notifications" element={<Notifications/>}/>
         <Route path="/restaurants" element={<RegistryPage kind="restaurants"/>}/>
         <Route path="/customers" element={<RegistryPage kind="customers"/>}/>
-        <Route path="/queue" element={<Queue/>}/>
-        <Route path="/history" element={<Queue/>}/>
 
     </Route></Route>
     <Route path="*" element={<Navigate to={signedIn ? '/dashboard' : '/login'} replace/>}/>

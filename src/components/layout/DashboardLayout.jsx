@@ -1,13 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  Armchair,
   Bell,
   Building2,
   ChevronDown,
-  History,
   LayoutDashboard,
-  ListOrdered,
   LogOut,
   MapPin,
   Menu,
@@ -50,9 +47,6 @@ export default function DashboardLayout() {
       [Building2, "Branches", "/branches"],
       [Users, "Managers", "/managers"],
       [UserRound, "Customers", "/customers"],
-      [Armchair, "Tables", "/tables"],
-      [ListOrdered, "Live queue", "/queue"],
-      [History, "Complete history", "/history"],
       [Bell, "Notifications", "/notifications"],
     ],
     [ROLES.RESTAURANT]: [
@@ -60,19 +54,14 @@ export default function DashboardLayout() {
       [LayoutDashboard, "Overview", "/dashboard"],
       [Building2, "Branches", "/branches"],
       [Users, "Managers", "/managers"],
-      [Armchair, "Tables", "/tables"],
     ],
     [ROLES.MANAGER]: [
       [LayoutDashboard, "Overview", "/dashboard"],
-      [ListOrdered, "Today's queue", "/queue"],
       [UserRound, "Customers", "/customers"],
-      [Armchair, "Tables", "/tables"],
-      [History, "Today's history", "/history"],
     ],
     [ROLES.CUSTOMER]: [
       [LayoutDashboard, "Overview", "/dashboard"],
       [MapPin, "Nearby restaurants", "/nearby"],
-      [ListOrdered, "My queue", "/my-queue"],
     ],
   };
   const links = roleLinks[user.role] || roleLinks[ROLES.CUSTOMER];
