@@ -8,7 +8,6 @@ import {
   ChevronDown,
   History,
   LayoutDashboard,
-  ListOrdered,
   LogOut,
   MapPin,
   Menu,
@@ -45,7 +44,7 @@ export default function DashboardLayout() {
     };
   }, [mobile]);
   const roleLinks = {
-    [ROLES.BRANCH]: [[LayoutDashboard, "Overview", "/dashboard"], [UserRound, "My Profile", "/my-profile"], [CalendarDays, "Schedules", "/schedules"], [Armchair, "Table", "/tables"], [Users, "Customer", "/customers"], [ListOrdered, "Queue", "/queue"], [Bell, "Notifications", "/notifications"]],
+    [ROLES.BRANCH]: [[LayoutDashboard, "Overview", "/dashboard"], [UserRound, "My Profile", "/my-profile"], [CalendarDays, "Schedules", "/schedules"], [Armchair, "Table", "/tables"], [Users, "Customer", "/customers"], [Bell, "Notifications", "/notifications"]],
     [ROLES.SUPER_ADMIN]: [
       [LayoutDashboard, "Overview", "/dashboard"],
       [Store, "Restaurants", "/restaurants"],
@@ -53,7 +52,6 @@ export default function DashboardLayout() {
       [Users, "Managers", "/managers"],
       [UserRound, "Customers", "/customers"],
       [Armchair, "Tables", "/tables"],
-      [ListOrdered, "Live queue", "/queue"],
       [History, "Complete history", "/history"],
     ],
     [ROLES.RESTAURANT]: [
@@ -65,7 +63,6 @@ export default function DashboardLayout() {
     ],
     [ROLES.MANAGER]: [
       [LayoutDashboard, "Overview", "/dashboard"],
-      [ListOrdered, "Today's queue", "/queue"],
       [UserRound, "Customers", "/customers"],
       [Armchair, "Tables", "/tables"],
       [History, "Today's history", "/history"],
@@ -73,7 +70,6 @@ export default function DashboardLayout() {
     [ROLES.CUSTOMER]: [
       [LayoutDashboard, "Overview", "/dashboard"],
       [MapPin, "Nearby restaurants", "/nearby"],
-      [ListOrdered, "My queue", "/my-queue"],
     ],
   };
   const links = roleLinks[user.role] || roleLinks[ROLES.CUSTOMER];

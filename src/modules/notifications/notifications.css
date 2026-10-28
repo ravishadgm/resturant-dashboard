@@ -25,12 +25,4 @@
 .nt-audience-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.nt-audience-option{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--border);border-radius:9px;padding:14px;cursor:pointer;background:#fff}.nt-audience-option.active{border-color:var(--purple);background:#faf8ff;box-shadow:0 0 0 1px var(--purple)}.nt-audience-option input{accent-color:var(--purple);margin:3px 0 0;flex:none}.nt-audience-option span{display:grid;gap:5px}.nt-audience-option strong{font-size:13px;font-weight:700}.nt-audience-option small{font-size:11px;color:var(--muted);line-height:1.5}
 .nt-audience-summary{font-size:12px;line-height:1.6;color:var(--muted);margin:12px 0 0}.nt-recipient-fieldset .nt-recipient-picker{margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:9px;background:#fcfbff}.nt-restaurant-option.selected{background:#f1edfc}.nt-recipient-list input{width:16px;height:16px;flex:none}.nt-recipient-list small{overflow-wrap:anywhere}.nt-recipient-picker .nt-error{margin-top:12px;display:grid;gap:10px}.nt-recipient-picker .nt-error .btn{justify-self:start}.nt-recipient-list label:hover{background:#f8f6fc}
 @media(max-width:560px){.nt-audience-options{grid-template-columns:1fr}.nt-recipient-fieldset .nt-recipient-picker{padding:12px}.nt-picker-footer>span:first-child{width:100%}}
-.nt-badge.normal,.nt-badge.important,.nt-badge.urgent{font-weight:700}
-.nt-form .field .nt-priority-select.normal{background:#e8f7ee;color:#166534;border-color:#a7dcb9}
-.nt-form .field .nt-priority-select.important{background:#eaf2ff;color:#1e40af;border-color:#adc9f5}
-.nt-form .field .nt-priority-select.urgent{background:#ffedef;color:#b42539;border-color:#f2b5be}
-.nt-priority-select option{background:#fff;color:var(--ink)}
-.nt-target-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.nt-customer-scope{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;font-size:13px}.nt-customer-scope label{display:flex;align-items:center;gap:8px}.nt-customer-scope input{accent-color:var(--purple)}
 .nt-recipient-summary{padding:12px 14px;border-radius:8px;background:#f4f1fc;color:#55427e;font-size:12px;line-height:1.6;margin:16px 0 0}
-@media(max-width:560px){.nt-target-options{grid-template-columns:1fr}}

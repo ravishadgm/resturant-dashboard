@@ -10,7 +10,6 @@ import ProtectedRoute from './ProtectedRoute';
 import Notifications from '../modules/notifications/Notifications';
 import TableList from '../modules/tables/TableList';
 import CustomerList from '../modules/customers/CustomerList';
-import BranchQueueList from '../modules/queue/BranchQueueList';
 export default function AppRoutes() {
   const {user}=useAuth();
   const signedIn=user?.role===PORTAL_ROLE;
@@ -22,7 +21,6 @@ export default function AppRoutes() {
       <Route path="/schedules" element={<BranchSchedules/>}/>
       <Route path="/tables" element={<TableList/>}/>
       <Route path="/customers" element={<CustomerList/>}/>
-      <Route path="/queue" element={<BranchQueueList/>}/>
       <Route path="/notifications" element={<Notifications/>}/>
     </Route></Route>
     <Route path="*" element={<Navigate to={signedIn?'/dashboard':'/login'} replace/>}/>
