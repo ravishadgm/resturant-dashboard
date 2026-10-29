@@ -7,6 +7,7 @@ import { Modal } from '../../components/common/Modal';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { branchApi } from '../../api/branchApi';
+import NotificationReceiver from './NotificationReceiver';
 
 
 import { audienceLabel, emptyAnnouncement, branchAnnouncement, notificationStore, validateAnnouncement } from '../../services/notificationService';
@@ -88,6 +89,7 @@ export default function Notifications() {
   return <div className="notifications-page">
     <PageHeader title="Notifications" description="Send notifications to all admins, all customers, or selected branches." action={<button className="btn primary" disabled={!!storageError} onClick={() => edit()}><Plus size={17}/> New announcement</button>}/>
 
+    <NotificationReceiver />
     {storageError && <p role="alert" className="nt-error">{storageError}</p>}
     <CommonTable columns={columns} data={sentRows} searchPlaceholder="Search sent messages"/>
     <Modal open={!!form} title="New announcement" size="wide" onClose={() => setForm(null)}>
