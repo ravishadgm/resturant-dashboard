@@ -25,7 +25,10 @@ function getFirebaseApp() {
 }
 
 function getWorkerUrl() {
-  const url = new URL(`${import.meta.env.BASE_URL}firebase-messaging-sw.js`, window.location.origin);
+  const basePath = import.meta.env.BASE_URL.endsWith('/')
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
+  const url = new URL(`${basePath}firebase-messaging-sw.js`, window.location.origin);
   Object.entries(firebaseConfig).forEach(([key, value]) => {
     if (value) url.searchParams.set(key, value);
   });
@@ -47,7 +50,10 @@ export async function registerRestaurantBrowser() {
     : await Notification.requestPermission();
   if (permission !== 'granted') throw new Error('Allow browser notifications to connect this device.');
 
-  const workerScope = new URL(import.meta.env.BASE_URL, window.location.origin).pathname;
+  const basePath = import.meta.env.BASE_URL.endsWith('/')
+    ? import.meta.env.BASE_URL
+    : `${import.meta.env.BASE_URL}/`;
+  const workerScope = new URL(basePath, window.location.origin).pathname;
   const registration = await navigator.serviceWorker.register(getWorkerUrl(), { scope: workerScope });
   const messaging = getMessaging(getFirebaseApp());
   const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: registration });
