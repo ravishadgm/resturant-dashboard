@@ -5,6 +5,8 @@ import ServerTable from '../../components/common/ServerTable';
 import { Modal } from '../../components/common/Modal';
 import { useToast } from '../../context/ToastContext';
 import { restaurantAnnouncementApi } from '../../api/restaurantAnnouncementApi';
+import { disableRestaurantBrowser, registerRestaurantBrowser } from '../../services/firebaseMessaging';
+import { clearDeviceToken, getWebDeviceDetails, saveDeviceToken } from '../../services/deviceService';
 import './notifications.css';
 
 const audiences = {
@@ -37,6 +39,8 @@ export default function RestaurantNotifications() {
   const [form, setForm] = useState(null);
   const [formError, setFormError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [pushToken, setPushToken] = useState(() => getWebDeviceDetails().device_token);
+  const [pushBusy, setPushBusy] = useState(false);
 
   const load = useCallback(async ({ page = 1, limit = 10 } = {}) => {
     setLoading(true); setListError('');
@@ -78,6 +82,28 @@ export default function RestaurantNotifications() {
     finally { setSaving(false); }
   };
 
+  const enableNotifications = async () => {
+    setPushBusy(true);
+    try {
+      const { token } = await registerRestaurantBrowser();
+      saveDeviceToken(token);
+      setPushToken(token);
+      toast('Notifications are enabled for this browser.');
+    } catch (pushError) { toast(pushError instanceof Error ? pushError.message : 'Could not enable notifications.'); }
+    finally { setPushBusy(false); }
+  };
+
+  const disableNotifications = async () => {
+    setPushBusy(true);
+    try {
+      await disableRestaurantBrowser();
+      clearDeviceToken();
+      setPushToken('');
+      toast('Notifications are turned off for this browser.');
+    } catch (pushError) { toast(pushError instanceof Error ? pushError.message : 'Could not turn notifications off.'); }
+    finally { setPushBusy(false); }
+  };
+
   const columns = [
     { key: 'title', label: 'Title' },
     { key: 'message', label: 'Message', render: value => <span className="nt-table-message">{value}</span> },
@@ -87,7 +113,7 @@ export default function RestaurantNotifications() {
   ];
 
   return <div className="notifications-page">
-    <PageHeader title="Notifications" description="Send announcements and review restaurant notifications." action={<button className="btn primary" onClick={() => { setForm(initialForm()); setFormError(''); }}><Plus size={17}/> New announcement</button>}/>
+    <PageHeader title="Notifications" description="Send announcements and review restaurant notifications." action={<div className="nt-header-actions"><button type="button" className="btn secondary" disabled={pushBusy} onClick={pushToken ? disableNotifications : enableNotifications}>{pushBusy ? 'Updating...' : pushToken ? 'Turn notifications off' : 'Enable notifications'}</button><button className="btn primary" onClick={() => { setForm(initialForm()); setFormError(''); }}><Plus size={17}/> New announcement</button></div>}/>
     <div className="nt-list-tabs" role="tablist" aria-label="Announcement lists">
       <button type="button" role="tab" aria-selected={tab === 'all'} className={tab === 'all' ? 'active' : ''} onClick={() => setTab('all')}>All announcements</button>
       <button type="button" role="tab" aria-selected={tab === 'mine'} className={tab === 'mine' ? 'active' : ''} onClick={() => setTab('mine')}>My announcements</button>

@@ -24,6 +24,8 @@
 
 .nt-list-tabs{display:flex;gap:8px;margin:0 0 14px}.nt-list-tabs button{border:1px solid var(--border);border-radius:8px;padding:8px 12px;background:#fff;color:var(--muted);font:600 12px inherit;cursor:pointer}.nt-list-tabs button.active{border-color:var(--purple);background:#f5f1ff;color:var(--purple)}
 
+.nt-header-actions{display:flex;gap:9px;flex-wrap:wrap}.nt-header-actions .btn{white-space:nowrap}
+
 .nt-recipients{display:grid;gap:10px}.nt-recipient-heading{font-size:13px;font-weight:700;color:#454355}.nt-all-restaurants{display:flex;align-items:center;gap:9px;font-size:13px}.nt-all-restaurants input{accent-color:var(--purple)}
 
 .nt-recipient-fieldset{border:0;margin:0;padding:0;min-width:0}.nt-recipient-fieldset legend{padding:0;margin-bottom:10px;font-size:13px;font-weight:700;color:#454355}

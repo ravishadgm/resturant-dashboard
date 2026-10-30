@@ -1,5 +1,5 @@
 import { getApps, initializeApp } from 'firebase/app';
-import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
+import { deleteToken, getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -59,6 +59,11 @@ export async function registerRestaurantBrowser() {
   const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: registration });
   if (!token) throw new Error('Firebase did not return a registration token. Try refreshing the connection.');
   return { token, messaging };
+}
+
+export async function disableRestaurantBrowser() {
+  if (getMessagingConfigError() || !(await isSupported())) return;
+  await deleteToken(getMessaging(getFirebaseApp()));
 }
 
 export async function listenForRestaurantMessages(callback) {
