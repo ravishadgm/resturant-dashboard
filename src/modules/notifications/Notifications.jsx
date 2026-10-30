@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
-import { BellRing, Copy, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 import ServerTable from '../../components/common/ServerTable';
 
 import { Modal } from '../../components/common/Modal';
 import { useToast } from '../../context/ToastContext';
 import { audienceLabel, emptyAnnouncement, validateAnnouncement } from '../../services/notificationService';
-import { enablePushNotifications, showTestNotification } from '../../services/firebaseMessaging';
+import { disablePushNotifications, enablePushNotifications } from '../../services/firebaseMessaging';
 import { announcementApi } from '../../api/announcementApi';
-import { saveDeviceToken } from '../../services/deviceService';
+import { clearDeviceToken, getWebDeviceDetails, saveDeviceToken } from '../../services/deviceService';
 import './notifications.css';
 
 const dateLabel = value => value ? new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '—';
@@ -23,9 +23,8 @@ export default function Notifications() {
   const [form, setForm] = useState(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-  const [pushToken, setPushToken] = useState('');
-  const [pushStatus, setPushStatus] = useState('Not connected');
-  const [pushError, setPushError] = useState('');
+  const [pushToken, setPushToken] = useState(() => getWebDeviceDetails().device_token);
+  const [pushBusy, setPushBusy] = useState(false);
 
   const load = useCallback(async ({ page = 1, limit = 10 } = {}) => {
     setLoading(true);
@@ -58,28 +57,28 @@ export default function Notifications() {
     finally { setSaving(false); }
   };
   const enablePush = async () => {
-    setPushError('');
-    setPushStatus('Connecting...');
+    setPushBusy(true);
     try {
       const token = await enablePushNotifications(({ title, body }) => {
         toast(`Firebase message received: ${title}${body ? ` — ${body}` : ''}`);
       });
       setPushToken(token);
       saveDeviceToken(token);
-      setPushStatus('Connected');
       toast('Firebase notifications enabled. Sign in again to register this device token.');
     } catch (err) {
-      setPushStatus('Not connected');
-      setPushError(err instanceof Error ? err.message : 'Could not enable notifications.');
-    }
+      toast(err instanceof Error ? err.message : 'Could not enable notifications.');
+    } finally { setPushBusy(false); }
   };
-  const testPush = () => {
-    try { showTestNotification(); toast('Test notification displayed.'); }
-    catch (err) { setPushError(err instanceof Error ? err.message : 'Could not show the test notification.'); }
-  };
-  const copyToken = async () => {
-    try { await navigator.clipboard.writeText(pushToken); toast('FCM registration token copied.'); }
-    catch { setPushError('Could not copy the token. Select and copy it manually.'); }
+  const disablePush = async () => {
+    setPushBusy(true);
+    try {
+      await disablePushNotifications();
+      clearDeviceToken();
+      setPushToken('');
+      toast('Notifications are turned off for this browser.');
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Could not turn notifications off.');
+    } finally { setPushBusy(false); }
   };
   const sentRows = records.map(record => ({
     ...record,
@@ -94,14 +93,14 @@ export default function Notifications() {
     { key: 'restaurant_name', label: 'Restaurant', render: value => value || '—' },
   ];
   return <div className="notifications-page">
-    <PageHeader title="Notifications" description="Create announcements and review all delivered notifications." action={<button className="btn primary" onClick={edit}><Plus size={17}/> New announcement</button>}/>
+    <PageHeader title="Notifications" description="Create announcements and review all delivered notifications." action={<div className="nt-header-actions"><button type="button" className="btn secondary" disabled={pushBusy} onClick={pushToken ? disablePush : enablePush}>{pushBusy ? 'Updating...' : pushToken ? 'Turn notifications off' : 'Enable notifications'}</button><button className="btn primary" onClick={edit}><Plus size={17}/> New announcement</button></div>}/>
 
     <div className="nt-list-tabs" role="tablist" aria-label="Announcement lists">
       <button type="button" role="tab" aria-selected={activeList === 'all'} className={activeList === 'all' ? 'active' : ''} onClick={() => setActiveList('all')}>All announcements</button>
       <button type="button" role="tab" aria-selected={activeList === 'mine'} className={activeList === 'mine' ? 'active' : ''} onClick={() => setActiveList('mine')}>My announcements</button>
     </div>
     {listError && <p role="alert" className="nt-error">{listError}</p>}
-    <section className="nt-push-panel" aria-labelledby="push-test-title">
+    {false && <section className="nt-push-panel" aria-labelledby="push-test-title">
       <div className="nt-push-icon"><BellRing size={21}/></div>
       <div className="nt-push-content">
         <div className="nt-push-heading"><div><h2 id="push-test-title">Firebase browser notification test</h2><p>Enable browser notifications to save this browser’s FCM token. The token is sent with your next login.</p></div><span className={pushStatus === 'Connected' ? 'status' : 'nt-push-status'}>{pushStatus}</span></div>
@@ -109,7 +108,7 @@ export default function Notifications() {
         <div className="nt-push-actions"><button type="button" className="btn primary" onClick={enablePush}>{pushStatus === 'Connected' ? 'Refresh connection' : 'Enable notifications'}</button><button type="button" className="btn secondary" onClick={testPush} disabled={pushStatus !== 'Connected'}>Show local test</button></div>
         {pushToken && <div className="nt-token"><label htmlFor="fcm-token">FCM registration token — copy this to Firebase Console → Messaging → Send test message</label><div><input id="fcm-token" value={pushToken} readOnly/><button type="button" className="btn secondary" onClick={copyToken} aria-label="Copy FCM registration token"><Copy size={16}/> Copy</button></div></div>}
       </div>
-    </section>
+    </section>}
     <ServerTable key={activeList} columns={columns} data={sentRows} loading={loading} total={total} onQueryChange={load} searchPlaceholder="Search announcements" minWidth={1050}/>
     <Modal open={!!form} title="New announcement" size="wide" onClose={() => setForm(null)}>
       {form && <form onSubmit={event => { event.preventDefault(); save(); }} noValidate><div className="nt-form">

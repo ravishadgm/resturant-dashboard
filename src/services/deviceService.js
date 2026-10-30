@@ -22,3 +22,4 @@ export function getWebDeviceDetails() {
 }
 
 export const saveDeviceToken = (token) => storage.set(STORAGE_KEYS.deviceToken, token);
+export const clearDeviceToken = () => storage.remove(STORAGE_KEYS.deviceToken);

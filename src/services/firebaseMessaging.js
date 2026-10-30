@@ -1,5 +1,5 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
+import { deleteToken, getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
 import {
   getInstallations,
   getId as getInstallationId,
@@ -76,6 +76,14 @@ export async function enablePushNotifications(onForegroundMessage) {
     onForegroundMessage(details, payload);
   });
   return token;
+}
+
+export async function disablePushNotifications() {
+  foregroundUnsubscribe?.();
+  foregroundUnsubscribe = undefined;
+  if (!configured() || !(await isSupported())) return;
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  await deleteToken(getMessaging(app));
 }
 
 export function showTestNotification() {
