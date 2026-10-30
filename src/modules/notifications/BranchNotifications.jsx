@@ -5,7 +5,7 @@ import ServerTable from '../../components/common/ServerTable';
 import { Modal } from '../../components/common/Modal';
 import { useToast } from '../../context/ToastContext';
 import { branchAnnouncementApi } from '../../api/branchAnnouncementApi';
-import { disableBranchBrowser, registerBranchBrowser } from '../../services/firebaseMessaging';
+import { disableBranchBrowser, listenForBranchMessages, registerBranchBrowser } from '../../services/firebaseMessaging';
 import { clearDeviceToken, getWebDeviceDetails, saveDeviceToken } from '../../services/deviceService';
 import './notifications.css';
 
@@ -40,6 +40,23 @@ export default function BranchNotifications() {
   }, [tab]);
 
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    if (!pushToken) return undefined;
+    let active = true;
+    let unsubscribe;
+    listenForBranchMessages(payload => {
+      if (!active) return;
+      const title = payload.notification?.title || payload.data?.title || 'New notification';
+      const body = payload.notification?.body || payload.data?.body || '';
+      if (Notification.permission === 'granted') new Notification(title, { body });
+      toast(`New notification: ${title}`);
+      load();
+    }).then(stop => {
+      if (active) unsubscribe = stop;
+      else stop();
+    }).catch(() => {});
+    return () => { active = false; unsubscribe?.(); };
+  }, [pushToken, toast, load]);
   const toggleAudience = audience => setForm(current => ({ ...current, audience: current.audience.includes(audience) ? current.audience.filter(value => value !== audience) : [...current.audience, audience] }));
 
   const save = async () => {
@@ -55,7 +72,7 @@ export default function BranchNotifications() {
 
   const enableNotifications = async () => {
     setPushBusy(true);
-    try { const token = await registerBranchBrowser(); saveDeviceToken(token); setPushToken(token); toast('Notifications are enabled for this browser.'); }
+    try { const token = await registerBranchBrowser(); saveDeviceToken(token); setPushToken(token); toast('Notifications are enabled. Sign out and sign in again to register this device with the server.'); }
     catch (pushError) { toast(pushError instanceof Error ? pushError.message : 'Could not enable notifications.'); }
     finally { setPushBusy(false); }
   };
