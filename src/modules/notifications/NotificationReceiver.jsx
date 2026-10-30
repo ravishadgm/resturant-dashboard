@@ -3,6 +3,7 @@ import { Bell, Check, Copy, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { getMessagingConfigError, listenForRestaurantMessages, registerRestaurantBrowser } from '../../services/firebaseMessaging';
+import { saveDeviceToken } from '../../services/deviceService';
 
 const tokenKeyFor = user => `restrodesk_fcm_restaurant_${user?.restaurant_id ?? user?.restaurant?.restaurant_id ?? user?.id ?? 'default'}`;
 
@@ -16,7 +17,9 @@ export default function NotificationReceiver() {
   const [received, setReceived] = useState(null);
 
   useEffect(() => {
-    setToken(localStorage.getItem(tokenKey) || '');
+    const savedToken = localStorage.getItem(tokenKey) || '';
+    setToken(savedToken);
+    if (savedToken) saveDeviceToken(savedToken);
   }, [tokenKey]);
 
   useEffect(() => {
@@ -41,6 +44,7 @@ export default function NotificationReceiver() {
     try {
       const result = await registerRestaurantBrowser();
       localStorage.setItem(tokenKey, result.token);
+      saveDeviceToken(result.token);
       setToken(result.token);
       toast('This restaurant browser is connected to Firebase.');
     } catch (err) {

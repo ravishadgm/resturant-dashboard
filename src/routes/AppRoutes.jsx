@@ -9,7 +9,7 @@ import Login from '../modules/auth/Login';
 import RegistryPage from '../modules/operations/RegistryPage';
 import MyProfile from '../modules/profile/MyProfile';
 import ProtectedRoute from './ProtectedRoute';
-import Notifications from '../modules/notifications/Notifications';
+import Notifications from '../modules/notifications/RestaurantNotifications';
 
 export default function AppRoutes() {
   const { user } = useAuth();
