@@ -5,7 +5,7 @@ import ServerTable from '../../components/common/ServerTable';
 import { Modal } from '../../components/common/Modal';
 import { useToast } from '../../context/ToastContext';
 import { restaurantAnnouncementApi } from '../../api/restaurantAnnouncementApi';
-import { disableRestaurantBrowser, registerRestaurantBrowser } from '../../services/firebaseMessaging';
+import { disableRestaurantBrowser, listenForRestaurantMessages, registerRestaurantBrowser } from '../../services/firebaseMessaging';
 import { clearDeviceToken, getWebDeviceDetails, saveDeviceToken } from '../../services/deviceService';
 import './notifications.css';
 
@@ -62,6 +62,23 @@ export default function RestaurantNotifications() {
   }, [tab]);
 
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    if (!pushToken) return undefined;
+    let active = true;
+    let unsubscribe;
+    listenForRestaurantMessages(payload => {
+      if (!active) return;
+      const title = payload.notification?.title || payload.data?.title || 'New notification';
+      const body = payload.notification?.body || payload.data?.body || '';
+      if (Notification.permission === 'granted') new Notification(title, { body });
+      toast(`New notification: ${title}`);
+      load();
+    }).then(stop => {
+      if (active) unsubscribe = stop;
+      else stop();
+    }).catch(() => {});
+    return () => { active = false; unsubscribe?.(); };
+  }, [pushToken, toast, load]);
 
   const toggleAudience = audience => setForm(current => ({
     ...current,
@@ -88,7 +105,7 @@ export default function RestaurantNotifications() {
       const { token } = await registerRestaurantBrowser();
       saveDeviceToken(token);
       setPushToken(token);
-      toast('Notifications are enabled for this browser.');
+      toast('Notifications are enabled. Sign out and sign in again to register this device with the server.');
     } catch (pushError) { toast(pushError instanceof Error ? pushError.message : 'Could not enable notifications.'); }
     finally { setPushBusy(false); }
   };
