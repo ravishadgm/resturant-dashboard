@@ -86,6 +86,23 @@ export async function disablePushNotifications() {
   await deleteToken(getMessaging(app));
 }
 
+export async function listenForPushNotifications(onForegroundMessage) {
+  if (!configured() || !(await isSupported())) return () => {};
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const messaging = getMessaging(app);
+  foregroundUnsubscribe?.();
+  const unsubscribe = onMessage(messaging, payload => {
+    const details = messageDetails(payload);
+    if (Notification.permission === 'granted') new Notification(details.title, { body: details.body });
+    onForegroundMessage(details, payload);
+  });
+  foregroundUnsubscribe = unsubscribe;
+  return () => {
+    if (foregroundUnsubscribe === unsubscribe) foregroundUnsubscribe = undefined;
+    unsubscribe();
+  };
+}
+
 export function showTestNotification() {
   if (Notification.permission !== 'granted') throw new Error('Enable browser notifications first.');
   new Notification('Firebase notification test', {

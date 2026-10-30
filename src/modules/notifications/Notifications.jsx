@@ -6,7 +6,7 @@ import ServerTable from '../../components/common/ServerTable';
 import { Modal } from '../../components/common/Modal';
 import { useToast } from '../../context/ToastContext';
 import { audienceLabel, emptyAnnouncement, validateAnnouncement } from '../../services/notificationService';
-import { disablePushNotifications, enablePushNotifications } from '../../services/firebaseMessaging';
+import { disablePushNotifications, enablePushNotifications, listenForPushNotifications } from '../../services/firebaseMessaging';
 import { announcementApi } from '../../api/announcementApi';
 import { clearDeviceToken, getWebDeviceDetails, saveDeviceToken } from '../../services/deviceService';
 import './notifications.css';
@@ -42,6 +42,20 @@ export default function Notifications() {
     } finally { setLoading(false); }
   }, [activeList]);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    if (!pushToken) return undefined;
+    let active = true;
+    let unsubscribe;
+    listenForPushNotifications(({ title, body }) => {
+      if (!active) return;
+      toast(`New notification: ${title}${body ? ` — ${body}` : ''}`);
+      load();
+    }).then(stop => {
+      if (active) unsubscribe = stop;
+      else stop();
+    }).catch(() => {});
+    return () => { active = false; unsubscribe?.(); };
+  }, [pushToken, toast, load]);
   const change = (key, value) => { setForm(current => ({ ...current, [key]: value })); setError(''); };
   const edit = () => { setForm(emptyAnnouncement()); setError(''); };
   const toggleGroup = group => { setForm(current => ({ ...current, groups: current.groups.includes(group) ? current.groups.filter(item => item !== group) : [...current.groups, group] })); setError(''); };
