@@ -1,6 +1,7 @@
 import { storage } from "../../services/storageService";
 import { STORAGE_KEYS, ROLES } from "../../utils/constants";
 import { authApi } from "../../api/authApi";
+import { getWebDeviceDetails } from '../../services/deviceService';
 
 import { PORTAL_ROLE } from '../../utils/portal';
 
@@ -30,7 +31,7 @@ export const authService = {
       [ROLES.CUSTOMER]: authApi.customerLogin,
     };
     const loginRequest = loginRequests[role] || authApi.adminLogin;
-    const response = await loginRequest({ email, password });
+    const response = await loginRequest({ email, password, ...getWebDeviceDetails() });
     const data = response?.data ?? response;
     const token = data?.token;
     if (response?.success === false) throw new Error(response.message || 'Unable to sign in.');

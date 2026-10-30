@@ -7,7 +7,7 @@ import BranchSchedules from '../modules/operations/BranchSchedules';
 import BranchProfile from '../modules/profile/BranchProfile';
 import BranchDashboard from '../modules/dashboard/BranchDashboard';
 import ProtectedRoute from './ProtectedRoute';
-import Notifications from '../modules/notifications/Notifications';
+import Notifications from '../modules/notifications/BranchNotifications';
 import TableList from '../modules/tables/TableList';
 import CustomerList from '../modules/customers/CustomerList';
 export default function AppRoutes() {
