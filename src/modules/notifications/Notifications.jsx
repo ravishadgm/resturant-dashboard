@@ -6,9 +6,9 @@ import ServerTable from '../../components/common/ServerTable';
 import { Modal } from '../../components/common/Modal';
 import { useToast } from '../../context/ToastContext';
 import { audienceLabel, emptyAnnouncement, validateAnnouncement } from '../../services/notificationService';
-import { disablePushNotifications, enablePushNotifications, listenForPushNotifications } from '../../services/firebaseMessaging';
+import { listenForPushNotifications } from '../../services/firebaseMessaging';
 import { announcementApi } from '../../api/announcementApi';
-import { clearDeviceToken, getWebDeviceDetails, saveDeviceToken } from '../../services/deviceService';
+import { getWebDeviceDetails } from '../../services/deviceService';
 import './notifications.css';
 
 const dateLabel = value => value ? new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '—';
@@ -23,8 +23,7 @@ export default function Notifications() {
   const [form, setForm] = useState(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-  const [pushToken, setPushToken] = useState(() => getWebDeviceDetails().device_token);
-  const [pushBusy, setPushBusy] = useState(false);
+  const [pushToken] = useState(() => getWebDeviceDetails().device_token);
 
   const load = useCallback(async ({ page = 1, limit = 10 } = {}) => {
     setLoading(true);
@@ -70,30 +69,6 @@ export default function Notifications() {
     } catch (saveError) { setError(saveError instanceof Error ? saveError.message : 'Could not send the announcement.'); }
     finally { setSaving(false); }
   };
-  const enablePush = async () => {
-    setPushBusy(true);
-    try {
-      const token = await enablePushNotifications(({ title, body }) => {
-        toast(`Firebase message received: ${title}${body ? ` — ${body}` : ''}`);
-      });
-      setPushToken(token);
-      saveDeviceToken(token);
-      toast('Firebase notifications enabled. Sign in again to register this device token.');
-    } catch (err) {
-      toast(err instanceof Error ? err.message : 'Could not enable notifications.');
-    } finally { setPushBusy(false); }
-  };
-  const disablePush = async () => {
-    setPushBusy(true);
-    try {
-      await disablePushNotifications();
-      clearDeviceToken();
-      setPushToken('');
-      toast('Notifications are turned off for this browser.');
-    } catch (err) {
-      toast(err instanceof Error ? err.message : 'Could not turn notifications off.');
-    } finally { setPushBusy(false); }
-  };
   const sentRows = records.map(record => ({
     ...record,
     recipientGroups: record.audience || audienceLabel(record),
@@ -107,7 +82,7 @@ export default function Notifications() {
     { key: 'restaurant_name', label: 'Restaurant', render: value => value || '—' },
   ];
   return <div className="notifications-page">
-    <PageHeader title="Notifications" description="Create announcements and review all delivered notifications." action={<div className="nt-header-actions"><button type="button" className="btn secondary" disabled={pushBusy} onClick={pushToken ? disablePush : enablePush}>{pushBusy ? 'Updating...' : pushToken ? 'Turn notifications off' : 'Enable notifications'}</button><button className="btn primary" onClick={edit}><Plus size={17}/> New announcement</button></div>}/>
+    <PageHeader title="Notifications" description="Create announcements and review all delivered notifications." action={<button className="btn primary" onClick={edit}><Plus size={17}/> New announcement</button>}/>
 
     <div className="nt-list-tabs" role="tablist" aria-label="Announcement lists">
       <button type="button" role="tab" aria-selected={activeList === 'all'} className={activeList === 'all' ? 'active' : ''} onClick={() => setActiveList('all')}>All announcements</button>

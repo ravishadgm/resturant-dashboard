@@ -40,7 +40,7 @@ function messageDetails(payload) {
   };
 }
 
-export async function enablePushNotifications(onForegroundMessage) {
+export async function enablePushNotifications(onForegroundMessage = () => {}) {
   if (!configured()) throw new Error('Firebase Messaging is not configured. Add the VITE_FIREBASE_* values to .env.');
   if (!('Notification' in window) || !('serviceWorker' in navigator)) throw new Error('This browser does not support push notifications.');
   if (!(await isSupported())) throw new Error('Firebase Messaging is not supported by this browser.');
