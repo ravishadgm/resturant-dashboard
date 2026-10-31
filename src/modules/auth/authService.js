@@ -1,7 +1,8 @@
 import { storage } from "../../services/storageService";
 import { STORAGE_KEYS, ROLES } from "../../utils/constants";
 import { authApi } from "../../api/authApi";
-import { getWebDeviceDetails } from '../../services/deviceService';
+import { getWebDeviceDetails, saveDeviceToken } from '../../services/deviceService';
+import { registerRestaurantBrowser } from '../../services/firebaseMessaging';
 
 import { PORTAL_ROLE } from '../../utils/portal';
 
@@ -30,6 +31,16 @@ export const authService = {
       [ROLES.CUSTOMER]: authApi.customerLogin,
     };
     const loginRequest = loginRequests[role] || authApi.adminLogin;
+    if (!getWebDeviceDetails().device_token) {
+      try {
+        // The sign-in submit is a browser user action, which lets us request
+        // notification permission and include the FCM token in this first login.
+        const { token: deviceToken } = await registerRestaurantBrowser();
+        saveDeviceToken(deviceToken);
+      } catch {
+        // A denied permission or an unsupported browser must not prevent login.
+      }
+    }
     const response = await loginRequest({ email, password, ...getWebDeviceDetails() });
     const data = response?.data ?? response;
     const token = data?.token;
