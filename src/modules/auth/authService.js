@@ -1,7 +1,8 @@
 import { storage } from "../../services/storageService";
 import { STORAGE_KEYS, ROLES } from "../../utils/constants";
 import { authApi } from "../../api/authApi";
-import { getWebDeviceDetails } from '../../services/deviceService';
+import { getWebDeviceDetails, saveDeviceToken } from '../../services/deviceService';
+import { registerBranchBrowser } from '../../services/firebaseMessaging';
 
 import { PORTAL_ROLE } from '../../utils/portal';
 
@@ -31,6 +32,15 @@ export const authService = {
       [ROLES.CUSTOMER]: authApi.customerLogin,
     };
     const loginRequest = loginRequests[role] || authApi.adminLogin;
+    if (!getWebDeviceDetails().device_token) {
+      try {
+        // Sign in is a user action, so the FCM token can be created and sent
+        // with this very first login request.
+        saveDeviceToken(await registerBranchBrowser());
+      } catch {
+        // Do not prevent login when notifications are denied or unavailable.
+      }
+    }
     const response = await loginRequest({ email, password, ...getWebDeviceDetails() });
     const data = response?.data ?? response;
     const token = data?.token;
